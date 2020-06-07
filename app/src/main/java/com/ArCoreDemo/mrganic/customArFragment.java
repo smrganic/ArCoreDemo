@@ -1,4 +1,4 @@
-package com.example.test;
+package com.ArCoreDemo.mrganic;
 
 import com.google.ar.core.Config;
 import com.google.ar.core.Session;

@@ -1,4 +1,4 @@
-package com.example.test;
+package com.ArCoreDemo.mrganic;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,10 +8,8 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import com.google.ar.core.Anchor;
-import com.google.ar.core.Config;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.rendering.ModelRenderable;
-import com.google.ar.sceneform.ux.ArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
 public class ArActivity extends AppCompatActivity {

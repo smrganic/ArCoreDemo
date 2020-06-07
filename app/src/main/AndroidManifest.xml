@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.test">
+    package="com.ArCoreDemo.mrganic">
     <!-- Both "AR Optional" and "AR Required" apps require CAMERA permission. -->
     <uses-permission android:name="android.permission.CAMERA" /> <!-- Sceneform requires OpenGL ES 3.0 or later. -->
     <uses-feature
@@ -14,8 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ArActivity"></activity>
-        <activity android:name=".MainActivity">
+        <activity android:name="com.ArCoreDemo.mrganic.ArActivity"></activity>
+        <activity android:name="com.ArCoreDemo.mrganic.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
