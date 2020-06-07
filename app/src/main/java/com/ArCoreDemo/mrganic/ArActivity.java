@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.google.ar.core.Anchor;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.ux.TransformableNode;
 
@@ -43,8 +44,13 @@ public class ArActivity extends AppCompatActivity {
         //Setting up SceneForm with ArFragment using ArCore
         fragment = (customArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
 
+        RenderableSource source = RenderableSource.builder().setSource(fragment.getArSceneView().getContext(),
+                selectedObject, RenderableSource.SourceType.GLTF2)
+                .setRecenterMode(RenderableSource.RecenterMode.ROOT)
+                .build();
+
         ModelRenderable.builder()
-                .setSource(this, selectedObject)
+                .setSource(this, source)
                 .build()
                 .thenAccept(object3D -> modelRenderable = object3D)
                 .exceptionally(

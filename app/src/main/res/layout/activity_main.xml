@@ -10,7 +10,7 @@
         android:id="@+id/scene_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@+id/linLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -19,64 +19,12 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/enterAr"
+        android:id="@+id/enter3D"
         android:text="View in 3D"
         android:background="@drawable/arbutton"
-        app:layout_constraintBottom_toTopOf="@+id/linLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_marginBottom="32dp"/>
 
-
-    <LinearLayout
-        android:id="@+id/linLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/scene_view"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:gravity="center"
-
-        >
-
-        <ImageView
-            android:scaleType="centerCrop"
-            android:id="@+id/ivLamp"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@drawable/lamp_thumb"
-            android:contentDescription="lamp"
-            android:layout_weight="1"
-            />
-        <ImageView
-            android:scaleType="centerCrop"
-            android:id="@+id/ivColiseum"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@drawable/colliseum"
-            android:contentDescription="colliseum"
-            android:layout_weight="1"
-            />
-        <ImageView
-            android:scaleType="centerCrop"
-            android:id="@+id/ivflowers"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@drawable/flowers"
-            android:contentDescription="flowers"
-            android:layout_weight="1"
-            />
-        <ImageView
-            android:scaleType="centerCrop"
-            android:id="@+id/ivGamingPc"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:src="@drawable/gamingpc"
-            android:contentDescription="gamingpc"
-            android:layout_weight="1"
-            />
-
-    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
