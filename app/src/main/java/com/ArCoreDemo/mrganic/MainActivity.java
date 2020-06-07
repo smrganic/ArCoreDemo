@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private SceneView sceneView;
     private Scene scene;
 
-    private Uri selectedObject;
+    private Uri selectedObject = null;
 
     private Node node = new Node();
 
@@ -127,19 +127,23 @@ public class MainActivity extends AppCompatActivity {
     private void setARListeners() {
         button.setOnClickListener(v -> {
             //Creates new intent with source -> destination and starts new activity
-            Intent i = new Intent(MainActivity.this, ArActivity.class);
-            i.putExtra("fileName", selectedObject.toString());
-            startActivity(i);
+            if(selectedObject != null){
+                Intent i = new Intent(MainActivity.this, ArActivity.class);
+                i.putExtra("fileName", selectedObject.toString());
+                startActivity(i);
+            }
         });
     }
 
 
     private void setNonArListeners() {
         button.setOnClickListener(v -> {
-            Intent sceneViewerIntent = new Intent(Intent.ACTION_VIEW);
-            sceneViewerIntent.setData(selectedObject);
-            sceneViewerIntent.setPackage("com.google.android.googlequicksearchbox");
-            startActivity(sceneViewerIntent);
+            if(selectedObject != null){
+                Intent sceneViewerIntent = new Intent(Intent.ACTION_VIEW);
+                sceneViewerIntent.setData(selectedObject);
+                sceneViewerIntent.setPackage("com.google.android.googlequicksearchbox");
+                startActivity(sceneViewerIntent);
+            }
         });
     }
 
@@ -209,6 +213,7 @@ public class MainActivity extends AppCompatActivity {
                 .builder()
                 .setSource(sceneView.getContext(), Uri.parse(modelUrl), RenderableSource.SourceType.GLTF2)
                 .setRecenterMode(RenderableSource.RecenterMode.ROOT)
+                .setScale(0.25f)
                 .build();
 
         ModelRenderable
@@ -226,6 +231,5 @@ public class MainActivity extends AppCompatActivity {
         node.setRenderable(modelRenderable);
         node.setParent(scene);
         node.setWorldPosition(new Vector3(0f,-0.35f,-1f));
-        node.setLocalRotation(Quaternion.axisAngle(new Vector3(0.0f, 1.0f, 0.0f), -160f));
     }
 }

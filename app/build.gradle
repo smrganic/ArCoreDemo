@@ -43,24 +43,3 @@ dependencies {
 
     implementation 'com.google.ar.sceneform:assets:1.15.0'
 }
-
-
-sceneform.asset('sampledata/LampPost.obj',
-        'default',
-        'sampledata/LampPost.sfa',
-        'src/main/assets/LampPost')
-
-sceneform.asset('sampledata/coliseum.obj',
-        'default',
-        'sampledata/coliseum.sfa',
-        'src/main/assets/coliseum')
-
-sceneform.asset('sampledata/flowers.obj',
-        'default',
-        'sampledata/flowers.sfa',
-        'src/main/assets/flowers')
-
-sceneform.asset('sampledata/gamingpc.obj',
-        'default',
-        'sampledata/gamingpc.sfa',
-        'src/main/assets/gamingpc')

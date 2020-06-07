@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.google.ar.core.Anchor;
 import com.google.ar.sceneform.AnchorNode;
@@ -15,6 +15,7 @@ import com.google.ar.sceneform.ux.TransformableNode;
 
 public class ArActivity extends AppCompatActivity {
 
+    private static final String TAG = "ArActivity";
     private ModelRenderable modelRenderable;
     private customArFragment fragment;
 
@@ -55,7 +56,7 @@ public class ArActivity extends AppCompatActivity {
                 .thenAccept(object3D -> modelRenderable = object3D)
                 .exceptionally(
                         throwable -> {
-                            Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "Failed to load ModelRenderable");
                             return null;
                         });
 
