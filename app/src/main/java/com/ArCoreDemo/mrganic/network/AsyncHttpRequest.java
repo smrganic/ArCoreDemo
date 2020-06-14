@@ -32,7 +32,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-class AsyncHttpRequest {
+public class AsyncHttpRequest {
     private static final String TAG = "HttpRequest";
 
     // The URL of the request.
@@ -54,7 +54,7 @@ class AsyncHttpRequest {
      * @param handler  The handler on which the listener should be called.
      * @param listener The listener to call when the request completes.
      */
-    AsyncHttpRequest(String url, Handler handler, CompletionListener listener) {
+    public AsyncHttpRequest(String url, Handler handler, CompletionListener listener) {
         this.handler = handler;
         this.listener = listener;
         try {
@@ -70,7 +70,7 @@ class AsyncHttpRequest {
      * After the request completes, the listener specified in the constructor will be called
      * to report the result of the request. This method does not block, it returns immediately.
      */
-    void send() {
+    public void send() {
         if (requestStarted) {
             throw new IllegalStateException("AsyncHttpRequest can only be sent once.");
         }

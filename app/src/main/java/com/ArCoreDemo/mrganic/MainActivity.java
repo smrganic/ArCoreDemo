@@ -1,37 +1,48 @@
 package com.ArCoreDemo.mrganic;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.ArCoreDemo.mrganic.interfaces.CompletionListener;
+import com.ArCoreDemo.mrganic.network.Parser;
 import com.ArCoreDemo.mrganic.network.PolyAPI;
+import com.ArCoreDemo.mrganic.recycler.item;
+import com.ArCoreDemo.mrganic.recycler.itemAdapter;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.SceneView;
 import com.google.ar.sceneform.assets.RenderableSource;
-import com.google.ar.sceneform.math.Quaternion;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.nio.charset.Charset;
+import java.io.IOException;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button button;
+    private Button button3D;
+    private Button buttonSearch;
+
+    private RecyclerView recyclerView;
 
     private static final String TAG = "MainActivityTAG";
     private SceneView sceneView;
@@ -84,9 +95,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void init() {
 
-        button = findViewById(R.id.enter3D);
-
-        checkIfPhoneIsArCompatible();
+        setupButtons();
+        setupRecycler();
 
         // Setup scene needed to display models
         sceneView = findViewById(R.id.scene_view);
@@ -102,6 +112,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Call the api
         setAPICall(polyAPI, backGroundThreadHandler);
+    }
+
+    private void setupButtons() {
+        button3D = findViewById(R.id.btnEnter3D);
+        buttonSearch = findViewById(R.id.btnSearchPoly);
+        checkIfPhoneIsArCompatible();
+        buttonSearch.setOnClickListener(this::onSearch);
     }
 
 
@@ -125,29 +142,106 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setARListeners() {
-        button.setOnClickListener(v -> {
+        button3D.setOnClickListener(v -> {
             //Creates new intent with source -> destination and starts new activity
             if(selectedObject != null){
                 Intent i = new Intent(MainActivity.this, ArActivity.class);
                 i.putExtra("fileName", selectedObject.toString());
                 startActivity(i);
             }
+            else {
+                Toast t = Toast.makeText(this, R.string.noModels, Toast.LENGTH_SHORT);
+                t.setGravity(Gravity.CENTER, 0, 0);
+                t.show();
+
+            }
         });
     }
 
 
     private void setNonArListeners() {
-        button.setOnClickListener(v -> {
+        button3D.setOnClickListener(v -> {
             if(selectedObject != null){
                 Intent sceneViewerIntent = new Intent(Intent.ACTION_VIEW);
                 sceneViewerIntent.setData(selectedObject);
                 sceneViewerIntent.setPackage("com.google.android.googlequicksearchbox");
                 startActivity(sceneViewerIntent);
             }
+            else {
+                Toast t = Toast.makeText(this, R.string.noModels, Toast.LENGTH_SHORT);
+                t.setGravity(Gravity.CENTER, 0, 0);
+                t.show();
+
+            }
+        });
+    }
+
+    //Creates a new search dialog and calls Poly API using keyword
+    private void onSearch(View view) {
+        View search = this
+                .getLayoutInflater()
+                .inflate(R.layout.searchpopup, (ViewGroup) view.getParent(), false);
+
+        EditText editText = search.findViewById(R.id.keyword);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Search 3D Models")
+                .setView(search)
+                .setPositiveButton("Search", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String keyword = editText.getText().toString();
+                        callAPIWithKeyword(keyword);
+                    }
+                })
+                .setCancelable(true)
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create()
+                .show();
+    }
+
+    private void callAPIWithKeyword(String keyword) {
+        polyAPI.ListAssets(keyword, true, "", backGroundThreadHandler, new CompletionListener() {
+            @Override
+            public void onHttpRequestFailure(int status, String message, Exception ex) {
+                handleFailure(status, message, ex);
+            }
+
+            @Override
+            public void onHttpRequestSuccess(byte[] responseBody) {
+                try{
+                    List<item> items = Parser.parseListAssets(responseBody, backGroundThreadHandler);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            itemAdapter adapter = new itemAdapter(items);
+                            recyclerView.setAdapter(adapter);
+                        }
+                    });
+                }
+                catch (IOException ex) {
+                    handleFailure(-100, "Error parsing list.", ex);
+                }
+            }
         });
     }
 
 
+    private void setupRecycler() {
+        recyclerView = findViewById(R.id.recycleView);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        recyclerView.setLayoutManager(layoutManager);
+
+    }
+
+    //This code handles loading the default poly model with a given id
     private void setAPICall(PolyAPI polyAPI, Handler handler) {
         polyAPI.GetAsset(ID, handler, new CompletionListener() {
             @Override
@@ -157,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onHttpRequestSuccess(byte[] responseBody) {
-                parseAsset(responseBody);
+                renderObject(Parser.parseAsset(responseBody));
             }
         });
     }
@@ -169,61 +263,28 @@ public class MainActivity extends AppCompatActivity {
         if (ex != null) ex.printStackTrace();
     }
 
-
-    private void parseAsset(byte[] responseBody) {
-
-        String assetBody = new String(responseBody, Charset.forName("UTF-8"));
-
-        try {
-
-            JSONObject response = new JSONObject(assetBody);
-
-            String displayName = response.getString("displayName");
-            String authorName = response.getString("authorName");
-            Log.d(TAG, "Display name: " + displayName);
-            Log.d(TAG, "Author name: " + authorName);
-
-            JSONArray formats = response.getJSONArray("formats");
-            for (int i = 0; i < formats.length(); i++) {
-                JSONObject format = formats.getJSONObject(i);
-
-                if (format.getString("formatType").equals("GLTF2")) {
-                    runOnUiThread(() -> {
-                        try {
-                            renderObject(format.getJSONObject("root").getString("url"));
-                        }
-                        catch (JSONException jsonException) {
-                            Log.e(TAG, "JSON parsing error while processing response: " + jsonException);
-                            jsonException.printStackTrace();
-                        }
-                    });
-                }
-            }
-        }
-        catch (JSONException jsonException) {
-            Log.e(TAG, "JSON parsing error while processing response: " + jsonException);
-            jsonException.printStackTrace();
-        }
-    }
-
-
     private void renderObject(String modelUrl) {
 
-        RenderableSource source = RenderableSource
-                .builder()
-                .setSource(sceneView.getContext(), Uri.parse(modelUrl), RenderableSource.SourceType.GLTF2)
-                .setRecenterMode(RenderableSource.RecenterMode.ROOT)
-                .setScale(0.25f)
-                .build();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                RenderableSource source = RenderableSource
+                        .builder()
+                        .setSource(sceneView.getContext(), Uri.parse(modelUrl), RenderableSource.SourceType.GLTF2)
+                        .setRecenterMode(RenderableSource.RecenterMode.ROOT)
+                        .setScale(0.25f)
+                        .build();
 
-        ModelRenderable
-                .builder()
-                .setSource(sceneView.getContext(), source)
-                .build()
-                .thenAccept(this::updateNode);
+                ModelRenderable
+                        .builder()
+                        .setSource(sceneView.getContext(), source)
+                        .build()
+                        .thenAccept(MainActivity.this::updateNode);
 
-        selectedObject = Uri.parse(modelUrl);
-        Log.d(TAG, "selectedObjectURI" + modelUrl);
+                selectedObject = Uri.parse(modelUrl);
+                Log.d(TAG, "selectedObjectURI" + modelUrl);
+            }
+        });
     }
 
 

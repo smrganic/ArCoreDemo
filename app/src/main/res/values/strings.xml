@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ArCoreDemo</string>
+    <string name="noModels">Models need to be loaded first</string>
+    <string name="keywords">Keywords</string>
 </resources>
