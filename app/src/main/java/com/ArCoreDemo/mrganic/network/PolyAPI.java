@@ -70,7 +70,7 @@ public class PolyAPI {
                 .appendQueryParameter("key", apiKey)
                 .appendQueryParameter("curated", Boolean.toString(curatedOnly))
                 .appendQueryParameter("format", "GLTF2")
-                .appendQueryParameter("pageSize", "100");
+                .appendQueryParameter("pageSize", "10");
 
 
         if(keywords != null && !keywords.isEmpty()) {

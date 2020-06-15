@@ -30,15 +30,14 @@ public class itemAdapter extends RecyclerView.Adapter {
         ImageView iv = new ImageView(parent.getContext());
 
         FrameLayout.LayoutParams layoutParams =
-                new FrameLayout.LayoutParams(
-                        ActionBar.LayoutParams.WRAP_CONTENT,
-                        ActionBar.LayoutParams.WRAP_CONTENT);
+                new FrameLayout.LayoutParams(250, 250);
         layoutParams.setMargins(4,4,4,4);
 
         iv.setPadding(8,8,8,8);
         iv.setImageResource(R.drawable.ivplaceholder);
         iv.setCropToPadding(true);
         iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        
         iv.setLayoutParams(layoutParams);
 
         return new itemHolder(iv, this);

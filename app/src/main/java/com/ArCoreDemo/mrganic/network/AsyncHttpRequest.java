@@ -93,7 +93,7 @@ public class AsyncHttpRequest {
             copyStream(connection.getInputStream(), outputStream);
             postSuccess(outputStream.toByteArray());
         } catch (Exception ex) {
-            postFailure(0, "Exception while processing request to " + url, ex);
+            postFailure(-12, "Exception while processing request to " + url, ex);
         } finally {
             if (connection != null) {
                 connection.disconnect();

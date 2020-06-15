@@ -26,6 +26,7 @@ import com.ArCoreDemo.mrganic.recycler.item;
 import com.ArCoreDemo.mrganic.recycler.itemAdapter;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
+import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.SceneView;
@@ -41,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
 
     private Button button3D;
     private Button buttonSearch;
-
     private RecyclerView recyclerView;
 
     private static final String TAG = "MainActivityTAG";
@@ -54,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
 
     private PolyAPI polyAPI;
     private String APIKey;
-
     private Handler backGroundThreadHandler;
 
     private static final String ID = "9C-MLNfxaor";
@@ -64,7 +63,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        init();
+        setupButtons();
+        setupRecycler();
+        setupScene();
+        setupApi();
     }
 
 
@@ -92,27 +94,6 @@ public class MainActivity extends AppCompatActivity {
         sceneView.destroy();
     }
 
-
-    private void init() {
-
-        setupButtons();
-        setupRecycler();
-
-        // Setup scene needed to display models
-        sceneView = findViewById(R.id.scene_view);
-        scene = sceneView.getScene();
-
-        HandlerThread backgroundThread = new HandlerThread("loaderThread");
-        backgroundThread.start();
-        backGroundThreadHandler = new Handler(backgroundThread.getLooper());
-
-        // Init the api with key
-        APIKey = getString(R.string.apiKey);
-        polyAPI = new PolyAPI(APIKey);
-
-        // Call the api
-        setAPICall(polyAPI, backGroundThreadHandler);
-    }
 
     private void setupButtons() {
         button3D = findViewById(R.id.btnEnter3D);
@@ -234,15 +215,46 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupRecycler() {
         recyclerView = findViewById(R.id.recycleView);
-
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerView.setLayoutManager(layoutManager);
 
     }
 
+
+    private void setupScene() {
+        // Setup scene needed to display models
+        sceneView = findViewById(R.id.scene_view);
+        scene = sceneView.getScene();
+        sceneView.setOnClickListener(this::onSceneTouch);
+    }
+
+    private void onSceneTouch(View view) {
+        if(recyclerView.getAdapter() != null && recyclerView.getAdapter().getItemCount() != 0) {
+            String modelUrl = ((itemAdapter) recyclerView.getAdapter()).getSelected().getModelUrl();
+            selectedObject = Uri.parse(modelUrl);
+            renderObject(modelUrl);
+        }
+    }
+
+
+    private void setupApi() {
+
+        HandlerThread backgroundThread = new HandlerThread("loaderThread");
+        backgroundThread.start();
+        backGroundThreadHandler = new Handler(backgroundThread.getLooper());
+
+        // Init the api with key
+        APIKey = getString(R.string.apiKey);
+        polyAPI = new PolyAPI(APIKey);
+
+        // Call the api
+        defaultAPICall(polyAPI, backGroundThreadHandler);
+    }
+
+
     //This code handles loading the default poly model with a given id
-    private void setAPICall(PolyAPI polyAPI, Handler handler) {
+    private void defaultAPICall(PolyAPI polyAPI, Handler handler) {
         polyAPI.GetAsset(ID, handler, new CompletionListener() {
             @Override
             public void onHttpRequestFailure(int status, String message, Exception ex) {
@@ -282,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
                         .thenAccept(MainActivity.this::updateNode);
 
                 selectedObject = Uri.parse(modelUrl);
-                Log.d(TAG, "selectedObjectURI" + modelUrl);
+                Log.d(TAG, "selectedObjectURI " + modelUrl);
             }
         });
     }
