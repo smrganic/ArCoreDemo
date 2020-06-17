@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class itemHolder extends RecyclerView.ViewHolder {
 
-    private static final int SELECTED_VALUE = Color.BLUE;
+    private static final int SELECTED_VALUE = Color.BLACK;
     private static final int DESELECTED_VALUE = Color.WHITE;
 
     private itemAdapter adapter;

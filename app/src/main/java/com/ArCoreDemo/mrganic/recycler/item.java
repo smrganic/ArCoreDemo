@@ -1,20 +1,15 @@
 package com.ArCoreDemo.mrganic.recycler;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Handler;
-import android.util.Log;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.ArCoreDemo.mrganic.interfaces.CompletionListener;
-import com.ArCoreDemo.mrganic.network.AsyncHttpRequest;
 import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 
 import java.util.concurrent.CompletableFuture;
+
 
 public class item {
     private static final String TAG = "RecyclerItem";
@@ -23,7 +18,6 @@ public class item {
     private String modelUrl;
     private String thumbnail;
 
-    private CompletableFuture<Bitmap> thumbnailHolder;
     private RecyclerView.ViewHolder viewHolder;
     private CompletableFuture<ModelRenderable> modelRenderableHolder;
 
@@ -47,33 +41,6 @@ public class item {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
-    }
-
-    public CompletableFuture<Bitmap> getThumbnailHolder() {
-        return thumbnailHolder;
-    }
-
-    //Async loading of thumbnail image
-    public void loadThumbnail(Handler handler) {
-        if(thumbnailHolder == null) {
-            thumbnailHolder = new CompletableFuture<>();
-
-            CompletionListener listener = new CompletionListener() {
-                @Override
-                public void onHttpRequestFailure(int status, String message, Exception ex) {
-                    Log.e(TAG, "Thumbnail loading failed: " + status + " " + message, ex);
-                    thumbnailHolder.completeExceptionally(ex);
-                }
-
-                @Override
-                public void onHttpRequestSuccess(byte[] responseBody) {
-                    thumbnailHolder.complete(BitmapFactory.decodeByteArray(responseBody, 0, responseBody.length));
-                }
-            };
-
-            AsyncHttpRequest request = new AsyncHttpRequest(getThumbnail(), handler, listener);
-            request.send();
-        }
     }
 
     public RecyclerView.ViewHolder getViewHolder() {

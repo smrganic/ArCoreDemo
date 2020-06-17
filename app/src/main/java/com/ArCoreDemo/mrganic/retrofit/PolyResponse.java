@@ -4,7 +4,7 @@ package com.ArCoreDemo.mrganic.retrofit;
 import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-public class PolyObject {
+public class PolyResponse {
 
     @SerializedName("assets")
     private List<Asset> mAssets;

@@ -1,4 +1,4 @@
-package com.ArCoreDemo.mrganic;
+package com.ArCoreDemo.mrganic.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,6 +7,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.ArCoreDemo.mrganic.R;
+import com.ArCoreDemo.mrganic.CustomArFragment;
 import com.google.ar.core.Anchor;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.assets.RenderableSource;
@@ -17,7 +19,7 @@ public class ArActivity extends AppCompatActivity {
 
     private static final String TAG = "ArActivity";
     private ModelRenderable modelRenderable;
-    private customArFragment fragment;
+    private CustomArFragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +45,7 @@ public class ArActivity extends AppCompatActivity {
         Uri selectedObject = Uri.parse(intent.getStringExtra("fileName"));
 
         //Setting up SceneForm with ArFragment using ArCore
-        fragment = (customArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
+        fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
 
         RenderableSource source = RenderableSource.builder().setSource(fragment.getArSceneView().getContext(),
                 selectedObject, RenderableSource.SourceType.GLTF2)

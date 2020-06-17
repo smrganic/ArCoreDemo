@@ -1,16 +1,14 @@
-package com.ArCoreDemo.mrganic;
+package com.ArCoreDemo.mrganic.activity;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -19,10 +17,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.ArCoreDemo.mrganic.network.Parser;
+import com.ArCoreDemo.mrganic.R;
+import com.ArCoreDemo.mrganic.retrofit.PolyAPI;
+import com.ArCoreDemo.mrganic.utils.Parser;
 import com.ArCoreDemo.mrganic.recycler.item;
 import com.ArCoreDemo.mrganic.recycler.itemAdapter;
-import com.ArCoreDemo.mrganic.retrofit.PolyObject;
+import com.ArCoreDemo.mrganic.retrofit.PolyResponse;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.sceneform.Node;
@@ -41,11 +41,12 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
+
     private Button button3D;
     private Button buttonSearch;
     private RecyclerView recyclerView;
 
-    private static final String TAG = "MainActivityTAG";
     private SceneView sceneView;
     private Scene scene;
 
@@ -54,28 +55,17 @@ public class MainActivity extends AppCompatActivity {
     private Node node = new Node();
 
     private String APIKey;
-    private Call<PolyObject> PolyAPICall;
-
-    private static final String ID = "9C-MLNfxaor";
-
-    private Handler backGroundThreadHandler;
+    private Call<PolyResponse> PolyAPICall;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        APIKey = getString(R.string.apiKey);
         setupButtons();
         setupRecycler();
         setupScene();
-        setupApi();
-    }
-
-    private void setupApi() {
-        HandlerThread backgroundThread = new HandlerThread("loaderThread");
-        backgroundThread.start();
-        backGroundThreadHandler = new Handler(backgroundThread.getLooper());
-        APIKey = getString(R.string.apiKey);
     }
 
 
@@ -143,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast t = Toast.makeText(this, R.string.noModels, Toast.LENGTH_SHORT);
                 t.setGravity(Gravity.CENTER, 0, 0);
                 t.show();
-
             }
         });
     }
@@ -177,20 +166,12 @@ public class MainActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Search 3D Models")
                 .setView(search)
-                .setPositiveButton("Search", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String keyword = editText.getText().toString();
-                        callAPIWithKeyword(keyword);
-                    }
+                .setPositiveButton("Search", (dialog, which) -> {
+                    String keyword = editText.getText().toString();
+                    callAPIWithKeyword(keyword);
                 })
                 .setCancelable(true)
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .create()
                 .show();
     }
@@ -213,25 +194,29 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(TAG, "Url for data: " + urlBuilder.build().toString());
 
-        PolyAPICall = com.ArCoreDemo.mrganic.retrofit.PolyAPI.getApiInterface().getListAssets(urlBuilder.build().toString());
+        PolyAPICall = PolyAPI.getApiInterface().getListAssets(urlBuilder.build().toString());
         APICallPolyResponse();
     }
 
     private void APICallPolyResponse() {
-        PolyAPICall.enqueue(new Callback<PolyObject>() {
+        PolyAPICall.enqueue(new Callback<PolyResponse>() {
             @Override
-            public void onResponse(Call<PolyObject> call, Response<PolyObject> response) {
+            public void onResponse(Call<PolyResponse> call, Response<PolyResponse> response) {
                 if(response.isSuccessful()){
-                    List<item> items = Parser.parseListAssets(response.body(), backGroundThreadHandler);
+                    List<item> items = Parser.parseListAssets(response.body());
                     itemAdapter adapter = new itemAdapter(items);
                     recyclerView.setAdapter(adapter);
                 }
             }
 
             @Override
-            public void onFailure(Call<PolyObject> call, Throwable t) {
+            public void onFailure(Call<PolyResponse> call, Throwable t) {
                 Log.d(TAG, "Retrofit failed");
                 t.printStackTrace();
+
+                Toast toast = Toast.makeText(MainActivity.this, "Network request failed. Please try again.", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
             }
         });
     }
@@ -279,7 +264,6 @@ public class MainActivity extends AppCompatActivity {
                 .thenAccept(MainActivity.this::updateNode);
 
         selectedObject = modelUrl;
-        Log.d(TAG, "selectedObjectURI " + modelUrl);
     }
 
 

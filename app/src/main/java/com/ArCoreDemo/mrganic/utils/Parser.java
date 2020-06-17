@@ -1,11 +1,9 @@
-package com.ArCoreDemo.mrganic.network;
-
-import android.os.Handler;
+package com.ArCoreDemo.mrganic.utils;
 
 import com.ArCoreDemo.mrganic.recycler.item;
 import com.ArCoreDemo.mrganic.retrofit.Asset;
 import com.ArCoreDemo.mrganic.retrofit.Format;
-import com.ArCoreDemo.mrganic.retrofit.PolyObject;
+import com.ArCoreDemo.mrganic.retrofit.PolyResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +12,7 @@ public abstract class Parser {
 
     private static final String TAG = "Parser";
 
-    public static List<item> parseListAssets(PolyObject responseBody, Handler backGroundThreadHandler) {
+    public static List<item> parseListAssets(PolyResponse responseBody) {
 
         List<item> items = new ArrayList<>();
         List<Asset> assets = responseBody.getAssets();
@@ -26,7 +24,6 @@ public abstract class Parser {
             item item = new item(helper.getName());
             String url = helper.getThumbnail().getUrl();
             item.setThumbnail(url);
-            item.loadThumbnail(backGroundThreadHandler);
 
 
             List<Format> formats = helper.getFormats();

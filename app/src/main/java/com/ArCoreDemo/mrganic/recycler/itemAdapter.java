@@ -1,6 +1,5 @@
 package com.ArCoreDemo.mrganic.recycler;
 
-import android.app.ActionBar;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -9,12 +8,14 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ArCoreDemo.mrganic.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 public class itemAdapter extends RecyclerView.Adapter {
 
     private static final String TAG = "itemAdapter";
+
     private final List<item> items;
     private int selected;
 
@@ -27,8 +28,10 @@ public class itemAdapter extends RecyclerView.Adapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
+        //Programmatically create new image view
         ImageView iv = new ImageView(parent.getContext());
 
+        //Sets the parameters of the image view
         FrameLayout.LayoutParams layoutParams =
                 new FrameLayout.LayoutParams(250, 250);
         layoutParams.setMargins(4,4,4,4);
@@ -48,13 +51,10 @@ public class itemAdapter extends RecyclerView.Adapter {
         if(holder.getItemId() != position) {
             ((itemHolder) holder).setItem(items.get(position));
             items.get(position).setViewHolder(holder);
-            items.get(position)
-                    .getThumbnailHolder()
-                    .thenAccept(bitmap -> {
-                        ImageView iv = (ImageView) holder.itemView;
-                        iv.setImageBitmap(bitmap);
-                        iv.requestLayout();
-                    });
+            ImageView iv = (ImageView) holder.itemView;
+            Picasso.get().load(items.get(position).getThumbnail()).into(iv);
+            //Todo check what this does
+            iv.requestLayout();
         }
     }
 
