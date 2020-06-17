@@ -4,6 +4,8 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.ArCoreDemo.mrganic.recycler.item;
+import com.ArCoreDemo.mrganic.retrofit.Format;
+import com.ArCoreDemo.mrganic.retrofit.PolyObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,33 +59,15 @@ public abstract class Parser {
         }
     }
 
-    public static String parseAsset(byte[] responseBody) {
-
-        String assetBody = new String(responseBody, Charset.forName("UTF-8"));
+    public static String parseAsset(PolyObject responseBody) {
         String url = null;
-
-        try {
-
-            JSONObject response = new JSONObject(assetBody);
-
-            String displayName = response.getString("displayName");
-            String authorName = response.getString("authorName");
-            Log.d(TAG, "Display name: " + displayName);
-            Log.d(TAG, "Author name: " + authorName);
-
-            JSONArray formats = response.getJSONArray("formats");
-            for (int i = 0; i < formats.length(); i++) {
-                JSONObject format = formats.getJSONObject(i);
-
-                if (format.getString("formatType").equals("GLTF2")) {
-                    url = format.getJSONObject("root").getString("url");
-                }
+        List<Format> formats = responseBody.getFormats();
+        Format helper;
+        for(int i = 0; i < formats.size(); i++) {
+            helper = formats.get(i);
+            if(helper.getFormatType().equals("GLTF2")){
+                url = helper.getRoot().getUrl();
             }
-        }
-
-        catch (JSONException jsonException) {
-            Log.e(TAG, "JSON parsing error while processing response: " + jsonException);
-            jsonException.printStackTrace();
         }
         return url;
     }

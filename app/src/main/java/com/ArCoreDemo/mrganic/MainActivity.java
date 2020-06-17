@@ -24,6 +24,8 @@ import com.ArCoreDemo.mrganic.network.Parser;
 import com.ArCoreDemo.mrganic.network.PolyAPI;
 import com.ArCoreDemo.mrganic.recycler.item;
 import com.ArCoreDemo.mrganic.recycler.itemAdapter;
+import com.ArCoreDemo.mrganic.retrofit.IAPICallPoly;
+import com.ArCoreDemo.mrganic.retrofit.PolyObject;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.sceneform.FrameTime;
@@ -34,8 +36,15 @@ import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -52,9 +61,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Node node = new Node();
 
-    private PolyAPI polyAPI;
     private String APIKey;
-    private Handler backGroundThreadHandler;
+    private Call<PolyObject> PolyAPI;
 
     private static final String ID = "9C-MLNfxaor";
 
@@ -66,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
         setupButtons();
         setupRecycler();
         setupScene();
-        setupApi();
     }
 
 
@@ -187,27 +194,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void callAPIWithKeyword(String keyword) {
-        polyAPI.ListAssets(keyword, true, "", backGroundThreadHandler, new CompletionListener() {
+
+        APIKey = getString(R.string.apiKey);
+
+        /*Uri.Builder urlBuilder = new Uri.Builder()
+                .scheme("https")
+                .authority("poly.googleapis.com")
+                .appendPath("v1")
+                .appendPath("assets")
+                .appendQueryParameter("key", APIKey)
+                .appendQueryParameter("curated", Boolean.toString(true))
+                .appendQueryParameter("format", "GLTF2")
+                .appendQueryParameter("pageSize", "10");*/
+
+        String url = new Uri.Builder()
+                .scheme("https")
+                .authority("poly.googleapis.com")
+                .appendPath("v1")
+                .appendPath("assets")
+                .appendPath(ID)
+                .appendQueryParameter("key", APIKey)
+                .build().toString();
+
+        Log.d(TAG, "Url for data: " + url);
+
+        PolyAPI = com.ArCoreDemo.mrganic.retrofit.PolyAPI.getApiInterface(APIKey).getAsset(url);
+
+        APICallPolyResponse();
+    }
+
+    private void APICallPolyResponse() {
+        PolyAPI.enqueue(new Callback<PolyObject>() {
             @Override
-            public void onHttpRequestFailure(int status, String message, Exception ex) {
-                handleFailure(status, message, ex);
+            public void onResponse(Call<PolyObject> call, Response<PolyObject> response) {
+                if(response.isSuccessful()){
+                    renderObject(Parser.parseAsset(response.body()));
+                }
             }
 
             @Override
-            public void onHttpRequestSuccess(byte[] responseBody) {
-                try{
-                    List<item> items = Parser.parseListAssets(responseBody, backGroundThreadHandler);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            itemAdapter adapter = new itemAdapter(items);
-                            recyclerView.setAdapter(adapter);
-                        }
-                    });
-                }
-                catch (IOException ex) {
-                    handleFailure(-100, "Error parsing list.", ex);
-                }
+            public void onFailure(Call<PolyObject> call, Throwable t) {
+                Log.d(TAG, "Retrofit failed");
             }
         });
     }
@@ -237,66 +264,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    private void setupApi() {
-
-        HandlerThread backgroundThread = new HandlerThread("loaderThread");
-        backgroundThread.start();
-        backGroundThreadHandler = new Handler(backgroundThread.getLooper());
-
-        // Init the api with key
-        APIKey = getString(R.string.apiKey);
-        polyAPI = new PolyAPI(APIKey);
-
-        // Call the api
-        defaultAPICall(polyAPI, backGroundThreadHandler);
-    }
-
-
-    //This code handles loading the default poly model with a given id
-    private void defaultAPICall(PolyAPI polyAPI, Handler handler) {
-        polyAPI.GetAsset(ID, handler, new CompletionListener() {
-            @Override
-            public void onHttpRequestFailure(int status, String message, Exception ex) {
-               handleFailure(status, message, ex);
-            }
-
-            @Override
-            public void onHttpRequestSuccess(byte[] responseBody) {
-                renderObject(Parser.parseAsset(responseBody));
-            }
-        });
-    }
-
-
-    private void handleFailure(int status, String message, Exception ex) {
-        Log.e(TAG, "Request failed. Status code " + status + ", message: " + message +
-                ((ex != null) ? ", exception: " + ex : ""));
-        if (ex != null) ex.printStackTrace();
-    }
-
     private void renderObject(String modelUrl) {
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                RenderableSource source = RenderableSource
-                        .builder()
-                        .setSource(sceneView.getContext(), Uri.parse(modelUrl), RenderableSource.SourceType.GLTF2)
-                        .setRecenterMode(RenderableSource.RecenterMode.ROOT)
-                        .setScale(0.25f)
-                        .build();
+        Log.d(TAG, "URL for object render: " + modelUrl);
 
-                ModelRenderable
-                        .builder()
-                        .setSource(sceneView.getContext(), source)
-                        .build()
-                        .thenAccept(MainActivity.this::updateNode);
+        RenderableSource source = RenderableSource
+                .builder()
+                .setSource(sceneView.getContext(), Uri.parse(modelUrl), RenderableSource.SourceType.GLTF2)
+                .setRecenterMode(RenderableSource.RecenterMode.ROOT)
+                .setScale(0.25f)
+                .build();
 
-                selectedObject = Uri.parse(modelUrl);
-                Log.d(TAG, "selectedObjectURI " + modelUrl);
-            }
-        });
+        ModelRenderable
+                .builder()
+                .setSource(sceneView.getContext(), source)
+                .build()
+                .thenAccept(MainActivity.this::updateNode);
+
+        selectedObject = Uri.parse(modelUrl);
+        Log.d(TAG, "selectedObjectURI " + modelUrl);
     }
 
 

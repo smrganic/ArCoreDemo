@@ -3,7 +3,9 @@ package com.ArCoreDemo.mrganic.retrofit;
 
 import com.google.gson.annotations.SerializedName;
 
-public class PresentationParams {
+import java.io.Serializable;
+
+public class PresentationParams implements Serializable {
 
     @SerializedName("backgroundColor")
     private String mBackgroundColor;

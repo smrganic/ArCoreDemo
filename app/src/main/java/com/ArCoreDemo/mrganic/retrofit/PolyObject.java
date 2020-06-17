@@ -1,11 +1,12 @@
 
 package com.ArCoreDemo.mrganic.retrofit;
 
+import java.io.Serializable;
 import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
 
-public class PolyObject {
+public class PolyObject implements Serializable {
 
     @SerializedName("authorName")
     private String mAuthorName;
