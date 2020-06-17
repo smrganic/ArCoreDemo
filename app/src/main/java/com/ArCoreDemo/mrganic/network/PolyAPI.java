@@ -16,6 +16,7 @@ package com.ArCoreDemo.mrganic.network;
 
 import android.net.Uri;
 import android.os.Handler;
+import android.util.Log;
 
 import com.ArCoreDemo.mrganic.interfaces.CompletionListener;
 
@@ -80,6 +81,8 @@ public class PolyAPI {
             urlBuilder.appendQueryParameter("category", category);
         }
         String url = urlBuilder.build().toString();
+
+        Log.d(TAG, "Url used for connection: " + url);
 
         // Send an asynchronous request.
         AsyncHttpRequest request = new AsyncHttpRequest(url, handler, completionListener);
