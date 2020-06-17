@@ -8,13 +8,13 @@ import com.google.gson.annotations.SerializedName;
 public class OrientingRotation {
 
     @SerializedName("w")
-    private Long mW;
+    private Double mW;
 
-    public Long getW() {
+    public Double getW() {
         return mW;
     }
 
-    public void setW(Long w) {
+    public void Double(Double w) {
         mW = w;
     }
 

@@ -2,4 +2,5 @@
     <string name="app_name">ArCoreDemo</string>
     <string name="noModels">Models need to be loaded first</string>
     <string name="keywords">Keywords</string>
+    <string name="nothingForKeyword">No models for that keyword. Try something else.</string>
 </resources>

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +14,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -163,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
 
         EditText editText = search.findViewById(R.id.keyword);
 
-        new AlertDialog.Builder(this)
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
                 .setTitle("Search 3D Models")
                 .setView(search)
                 .setPositiveButton("Search", (dialog, which) -> {
@@ -172,8 +175,14 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .setCancelable(true)
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
-                .create()
-                .show();
+                .create();
+
+        //Spent way too much time on this
+        //This auto selects the edit text
+        //and shows keyboard
+        editText.requestFocus();
+        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        alertDialog.show();
     }
 
     private void callAPIWithKeyword(String keyword) {
@@ -186,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                 .appendQueryParameter("key", APIKey)
                 .appendQueryParameter("curated", Boolean.toString(true))
                 .appendQueryParameter("format", "GLTF2")
-                .appendQueryParameter("pageSize", "10");
+                .appendQueryParameter("pageSize", "30");
 
         if(keyword != null && !keyword.isEmpty()){
             urlBuilder.appendQueryParameter("keywords", keyword);
@@ -202,10 +211,18 @@ public class MainActivity extends AppCompatActivity {
         PolyAPICall.enqueue(new Callback<PolyResponse>() {
             @Override
             public void onResponse(Call<PolyResponse> call, Response<PolyResponse> response) {
-                if(response.isSuccessful()){
-                    List<item> items = Parser.parseListAssets(response.body());
-                    itemAdapter adapter = new itemAdapter(items);
-                    recyclerView.setAdapter(adapter);
+                if(response.body().isEmpty()) {
+                    Log.d(TAG, "Nothing on poly for that keyword");
+                    Toast toast = Toast.makeText(MainActivity.this, getString(R.string.nothingForKeyword), Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
+                else{
+                    if(response.isSuccessful()){
+                        List<item> items = Parser.parseListAssets(response.body());
+                        itemAdapter adapter = new itemAdapter(items);
+                        recyclerView.setAdapter(adapter);
+                    }
                 }
             }
 

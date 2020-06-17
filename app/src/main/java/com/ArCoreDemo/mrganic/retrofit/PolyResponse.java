@@ -37,4 +37,6 @@ public class PolyResponse {
         mTotalSize = totalSize;
     }
 
+    public boolean isEmpty() { return mAssets == null; }
+
 }

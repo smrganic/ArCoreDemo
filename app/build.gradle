@@ -43,10 +43,13 @@ dependencies {
 
     implementation 'com.google.ar.sceneform:assets:1.15.0'
 
+    //Provides recycler view
     implementation "androidx.recyclerview:recyclerview:1.1.0"
 
+    //Provides retrofit for api calls
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
 
+    //Provides image loading from source url
     implementation 'com.squareup.picasso:picasso:2.71828'
 }

@@ -19,7 +19,6 @@ public class item {
     private String thumbnail;
 
     private RecyclerView.ViewHolder viewHolder;
-    private CompletableFuture<ModelRenderable> modelRenderableHolder;
 
     //Constructor for item
     public item(String id) {
@@ -49,25 +48,5 @@ public class item {
 
     public void setViewHolder(RecyclerView.ViewHolder viewHolder) {
         this.viewHolder = viewHolder;
-    }
-
-    public CompletableFuture<ModelRenderable> createModelRenderableHolder() {
-        if(modelRenderableHolder == null){
-            Context context = viewHolder.itemView.getContext();
-
-            RenderableSource source = RenderableSource.builder()
-                    .setSource(context, Uri.parse(modelUrl), RenderableSource.SourceType.GLTF2)
-                    .build();
-                    /* This could help with model alignment will test later
-                    .setRecenterMode(RenderableSource.RecenterMode.ROOT)
-                    .build();
-                     */
-
-            modelRenderableHolder = ModelRenderable.builder()
-                    .setRegistryId(id).setSource(context, source)
-                    .build();
-        }
-
-        return modelRenderableHolder;
     }
 }
