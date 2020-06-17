@@ -19,16 +19,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.ArCoreDemo.mrganic.interfaces.CompletionListener;
 import com.ArCoreDemo.mrganic.network.Parser;
-import com.ArCoreDemo.mrganic.network.PolyAPI;
 import com.ArCoreDemo.mrganic.recycler.item;
 import com.ArCoreDemo.mrganic.recycler.itemAdapter;
-import com.ArCoreDemo.mrganic.retrofit.IAPICallPoly;
 import com.ArCoreDemo.mrganic.retrofit.PolyObject;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
-import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.SceneView;
@@ -36,15 +32,11 @@ import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -57,14 +49,16 @@ public class MainActivity extends AppCompatActivity {
     private SceneView sceneView;
     private Scene scene;
 
-    private Uri selectedObject = null;
+    private String selectedObject;
 
     private Node node = new Node();
 
     private String APIKey;
-    private Call<PolyObject> PolyAPI;
+    private Call<PolyObject> PolyAPICall;
 
     private static final String ID = "9C-MLNfxaor";
+
+    private Handler backGroundThreadHandler;
 
 
     @Override
@@ -74,6 +68,14 @@ public class MainActivity extends AppCompatActivity {
         setupButtons();
         setupRecycler();
         setupScene();
+        setupApi();
+    }
+
+    private void setupApi() {
+        HandlerThread backgroundThread = new HandlerThread("loaderThread");
+        backgroundThread.start();
+        backGroundThreadHandler = new Handler(backgroundThread.getLooper());
+        APIKey = getString(R.string.apiKey);
     }
 
 
@@ -151,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
         button3D.setOnClickListener(v -> {
             if(selectedObject != null){
                 Intent sceneViewerIntent = new Intent(Intent.ACTION_VIEW);
-                sceneViewerIntent.setData(selectedObject);
+                sceneViewerIntent.setData(Uri.parse(selectedObject));
                 sceneViewerIntent.setPackage("com.google.android.googlequicksearchbox");
                 startActivity(sceneViewerIntent);
             }
@@ -195,9 +197,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void callAPIWithKeyword(String keyword) {
 
-        APIKey = getString(R.string.apiKey);
-
-        /*Uri.Builder urlBuilder = new Uri.Builder()
+        Uri.Builder urlBuilder = new Uri.Builder()
                 .scheme("https")
                 .authority("poly.googleapis.com")
                 .appendPath("v1")
@@ -205,36 +205,33 @@ public class MainActivity extends AppCompatActivity {
                 .appendQueryParameter("key", APIKey)
                 .appendQueryParameter("curated", Boolean.toString(true))
                 .appendQueryParameter("format", "GLTF2")
-                .appendQueryParameter("pageSize", "10");*/
+                .appendQueryParameter("pageSize", "10");
 
-        String url = new Uri.Builder()
-                .scheme("https")
-                .authority("poly.googleapis.com")
-                .appendPath("v1")
-                .appendPath("assets")
-                .appendPath(ID)
-                .appendQueryParameter("key", APIKey)
-                .build().toString();
+        if(keyword != null && !keyword.isEmpty()){
+            urlBuilder.appendQueryParameter("keywords", keyword);
+        }
 
-        Log.d(TAG, "Url for data: " + url);
+        Log.d(TAG, "Url for data: " + urlBuilder.build().toString());
 
-        PolyAPI = com.ArCoreDemo.mrganic.retrofit.PolyAPI.getApiInterface(APIKey).getAsset(url);
-
+        PolyAPICall = com.ArCoreDemo.mrganic.retrofit.PolyAPI.getApiInterface().getListAssets(urlBuilder.build().toString());
         APICallPolyResponse();
     }
 
     private void APICallPolyResponse() {
-        PolyAPI.enqueue(new Callback<PolyObject>() {
+        PolyAPICall.enqueue(new Callback<PolyObject>() {
             @Override
             public void onResponse(Call<PolyObject> call, Response<PolyObject> response) {
                 if(response.isSuccessful()){
-                    renderObject(Parser.parseAsset(response.body()));
+                    List<item> items = Parser.parseListAssets(response.body(), backGroundThreadHandler);
+                    itemAdapter adapter = new itemAdapter(items);
+                    recyclerView.setAdapter(adapter);
                 }
             }
 
             @Override
             public void onFailure(Call<PolyObject> call, Throwable t) {
                 Log.d(TAG, "Retrofit failed");
+                t.printStackTrace();
             }
         });
     }
@@ -259,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
     private void onSceneTouch(View view) {
         if(recyclerView.getAdapter() != null && recyclerView.getAdapter().getItemCount() != 0) {
             String modelUrl = ((itemAdapter) recyclerView.getAdapter()).getSelected().getModelUrl();
-            selectedObject = Uri.parse(modelUrl);
+            selectedObject = modelUrl;
             renderObject(modelUrl);
         }
     }
@@ -281,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
                 .build()
                 .thenAccept(MainActivity.this::updateNode);
 
-        selectedObject = Uri.parse(modelUrl);
+        selectedObject = modelUrl;
         Log.d(TAG, "selectedObjectURI " + modelUrl);
     }
 

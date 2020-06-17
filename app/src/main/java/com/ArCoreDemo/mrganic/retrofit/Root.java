@@ -1,11 +1,10 @@
 
 package com.ArCoreDemo.mrganic.retrofit;
 
+
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
-
-public class Root implements Serializable {
+public class Root {
 
     @SerializedName("contentType")
     private String mContentType;

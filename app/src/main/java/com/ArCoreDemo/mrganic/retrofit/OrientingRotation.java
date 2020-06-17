@@ -1,12 +1,11 @@
 
 package com.ArCoreDemo.mrganic.retrofit;
 
+
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
 
-
-public class OrientingRotation implements Serializable {
+public class OrientingRotation {
 
     @SerializedName("w")
     private Long mW;

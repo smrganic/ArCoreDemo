@@ -3,9 +3,7 @@ package com.ArCoreDemo.mrganic.retrofit;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
-
-public class FormatComplexity implements Serializable {
+public class FormatComplexity {
 
     @SerializedName("triangleCount")
     private String mTriangleCount;

@@ -1,12 +1,11 @@
 
 package com.ArCoreDemo.mrganic.retrofit;
 
-import java.io.Serializable;
 import java.util.List;
+
 import com.google.gson.annotations.SerializedName;
 
-
-public class Format implements Serializable {
+public class Format {
 
     @SerializedName("formatComplexity")
     private FormatComplexity mFormatComplexity;

@@ -20,7 +20,6 @@ public class item {
     private static final String TAG = "RecyclerItem";
 
     private String id;
-    private String description;
     private String modelUrl;
     private String thumbnail;
 
@@ -34,14 +33,6 @@ public class item {
     }
 
     //Getters and setters
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getModelUrl() {
         return modelUrl;
     }

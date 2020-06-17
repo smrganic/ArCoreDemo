@@ -8,7 +8,5 @@ import retrofit2.http.Url;
 
 public interface IAPICallPoly {
     @GET
-    Call<List<PolyObject>> getListAssets(@Url String url);
-    @GET
-    Call<PolyObject> getAsset(@Url String url);
+    Call<PolyObject> getListAssets(@Url String url);
 }
