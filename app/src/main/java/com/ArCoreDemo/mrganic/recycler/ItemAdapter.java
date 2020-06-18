@@ -12,14 +12,14 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class itemAdapter extends RecyclerView.Adapter {
+public class ItemAdapter extends RecyclerView.Adapter {
 
-    private static final String TAG = "itemAdapter";
+    private static final String TAG = "ItemAdapter";
 
-    private final List<item> items;
+    private final List<Item> items;
     private int selected;
 
-    public itemAdapter(List<item> items) {
+    public ItemAdapter(List<Item> items) {
         this.items = items;
         selected = -1;
     }
@@ -43,13 +43,13 @@ public class itemAdapter extends RecyclerView.Adapter {
         
         iv.setLayoutParams(layoutParams);
 
-        return new itemHolder(iv, this);
+        return new ItemHolder(iv, this);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if(holder.getItemId() != position) {
-            ((itemHolder) holder).setItem(items.get(position));
+            ((ItemHolder) holder).setItem(items.get(position));
             items.get(position).setViewHolder(holder);
             ImageView iv = (ImageView) holder.itemView;
             Picasso.get().load(items.get(position).getThumbnail()).into(iv);
@@ -63,14 +63,14 @@ public class itemAdapter extends RecyclerView.Adapter {
         return items.size();
     }
 
-    public item getSelected() {
+    public Item getSelected() {
         if(selected >= 0){
             return items.get(selected);
         }
         else return null;
     }
 
-    public void setSelected(item item) {
+    public void setSelected(Item item) {
         if(item == null) {
             selected = -1;
         }

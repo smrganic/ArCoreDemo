@@ -1,6 +1,6 @@
 package com.ArCoreDemo.mrganic.utils;
 
-import com.ArCoreDemo.mrganic.recycler.item;
+import com.ArCoreDemo.mrganic.recycler.Item;
 import com.ArCoreDemo.mrganic.retrofit.Asset;
 import com.ArCoreDemo.mrganic.retrofit.Format;
 import com.ArCoreDemo.mrganic.retrofit.PolyResponse;
@@ -12,16 +12,16 @@ public abstract class Parser {
 
     private static final String TAG = "Parser";
 
-    public static List<item> parseListAssets(PolyResponse responseBody) {
+    public static List<Item> parseListAssets(PolyResponse responseBody) {
 
-        List<item> items = new ArrayList<>();
+        List<Item> items = new ArrayList<>();
         List<Asset> assets = responseBody.getAssets();
         Asset helper;
         Format formatHelper;
 
         for(int i = 0; i < assets.size(); i++) {
             helper = assets.get(i);
-            item item = new item(helper.getName());
+            Item item = new Item(helper.getName());
             String url = helper.getThumbnail().getUrl();
             item.setThumbnail(url);
 

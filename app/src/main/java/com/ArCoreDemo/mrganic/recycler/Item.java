@@ -1,17 +1,8 @@
 package com.ArCoreDemo.mrganic.recycler;
-
-import android.content.Context;
-import android.net.Uri;
-
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.ar.sceneform.assets.RenderableSource;
-import com.google.ar.sceneform.rendering.ModelRenderable;
 
-import java.util.concurrent.CompletableFuture;
-
-
-public class item {
+public class Item {
     private static final String TAG = "RecyclerItem";
 
     private String id;
@@ -20,8 +11,8 @@ public class item {
 
     private RecyclerView.ViewHolder viewHolder;
 
-    //Constructor for item
-    public item(String id) {
+    //Constructor for Item
+    public Item(String id) {
         this.id = id;
     }
 
