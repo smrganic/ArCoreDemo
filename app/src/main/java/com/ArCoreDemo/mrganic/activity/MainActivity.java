@@ -24,11 +24,11 @@ import com.ArCoreDemo.mrganic.recycler.ItemAdapter;
 import com.ArCoreDemo.mrganic.retrofit.PolyAPI;
 import com.ArCoreDemo.mrganic.utils.Parser;
 import com.ArCoreDemo.mrganic.retrofit.PolyResponse;
+import com.ArCoreDemo.mrganic.utils.SceneHelper;
 import com.google.ar.core.ArCoreApk;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
-import com.google.ar.sceneform.Node;
+import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Scene;
-import com.google.ar.sceneform.SceneView;
 import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
@@ -48,12 +48,9 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonSearch;
     private RecyclerView recyclerView;
 
-    private SceneView sceneView;
-    private Scene scene;
+    SceneHelper sceneHelper;
 
     private String selectedObject;
-
-    private Node node = new Node();
 
     private String APIKey;
     private Call<PolyResponse> PolyAPICall;
@@ -73,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        try { sceneView.resume(); }
+        try { sceneHelper.getSceneView().resume(); }
         catch (CameraNotAvailableException e){
             Log.e(TAG, "Something went wrong on resume " + e);
             e.printStackTrace();
@@ -84,14 +81,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        sceneView.pause();
+        sceneHelper.getSceneView().pause();
     }
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        sceneView.destroy();
+        sceneHelper.getSceneView().destroy();
+        sceneHelper = null;
     }
 
 
@@ -104,18 +102,22 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setupScene() {
+        sceneHelper = new SceneHelper(findViewById(R.id.scene_view), this);
         // Setup scene needed to display models
-        sceneView = findViewById(R.id.scene_view);
-        scene = sceneView.getScene();
-        sceneView.setOnClickListener(this::onSceneTouch);
-    }
 
-    private void onSceneTouch(View view) {
-        if(recyclerView.getAdapter() != null && recyclerView.getAdapter().getItemCount() != 0) {
-            String modelUrl = ((ItemAdapter) recyclerView.getAdapter()).getSelected().getModelUrl();
-            selectedObject = modelUrl;
-            renderObject(modelUrl);
-        }
+        sceneHelper.getScene().addOnUpdateListener(new Scene.OnUpdateListener() {
+            @Override
+            public void onUpdate(FrameTime frameTime) {
+                if(recyclerView.getAdapter() != null && recyclerView.getAdapter().getItemCount() != 0) {
+                    String modelUrl = ((ItemAdapter) recyclerView.getAdapter()).getSelected().getModelUrl();
+                    if(selectedObject != null && selectedObject.equals(modelUrl)){
+                        return;
+                    }
+                    selectedObject = modelUrl;
+                    renderObject(modelUrl);
+                }
+            }
+        });
     }
 
     private void renderObject(String modelUrl) {
@@ -124,14 +126,14 @@ public class MainActivity extends AppCompatActivity {
 
         RenderableSource source = RenderableSource
                 .builder()
-                .setSource(sceneView.getContext(), Uri.parse(modelUrl), RenderableSource.SourceType.GLTF2)
+                .setSource(sceneHelper.getSceneView().getContext(), Uri.parse(modelUrl), RenderableSource.SourceType.GLTF2)
                 .setRecenterMode(RenderableSource.RecenterMode.ROOT)
                 .setScale(0.25f)
                 .build();
 
         ModelRenderable
                 .builder()
-                .setSource(sceneView.getContext(), source)
+                .setSource(sceneHelper.getSceneView().getContext(), source)
                 .build()
                 .thenAccept(MainActivity.this::updateNode);
 
@@ -140,9 +142,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void updateNode(ModelRenderable modelRenderable) {
-        node.setRenderable(modelRenderable);
-        node.setParent(scene);
-        node.setWorldPosition(new Vector3(0f,-0.35f,-1f));
+        sceneHelper.getTransformableNode().getScaleController().setEnabled(true);
+        sceneHelper.getTransformableNode().getTranslationController().setEnabled(true);
+        sceneHelper.getTransformableNode().setRenderable(modelRenderable);
+        sceneHelper.getTransformableNode().setLocalPosition(new Vector3(0f,0f,-1f));
     }
 
 
@@ -267,6 +270,7 @@ public class MainActivity extends AppCompatActivity {
                     else {
                         List<Item> items = Parser.parseListAssets(response.body());
                         ItemAdapter adapter = new ItemAdapter(items);
+                        adapter.setSelected(items.get(0));
                         recyclerView.setAdapter(adapter);
                     }
                 }
