@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.ArCoreDemo.mrganic.R;
+import com.ArCoreDemo.mrganic.interfaces.CallBackListener;
 import com.ArCoreDemo.mrganic.recycler.Item;
 import com.ArCoreDemo.mrganic.recycler.ItemAdapter;
 import com.ArCoreDemo.mrganic.retrofit.PolyAPI;
@@ -26,11 +27,6 @@ import com.ArCoreDemo.mrganic.retrofit.PolyResponse;
 import com.ArCoreDemo.mrganic.utils.Utility;
 
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,16 +38,12 @@ public class MainActivity extends AppCompatActivity {
     private ItemAdapter adapter;
     private String selectedObject;
 
-    private String APIKey;
-    private Call<PolyResponse> PolyAPICall;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        APIKey = getString(R.string.apiKey);
-        callAPIWithKeyword("");
+        setupAPI();
         setupRecycler();
         setupButtons();
     }
@@ -72,6 +64,41 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+    }
+
+
+    private void setupAPI() {
+        PolyAPI.setAPIKey(getString(R.string.apiKey));
+
+        PolyAPI.callAPIWithKeyword("");
+
+        PolyAPI.setCallBackListener(new CallBackListener() {
+            @Override
+            public void successfulResponse(PolyResponse response) {
+                if(response.isEmpty()){
+                    Log.d(TAG, "Nothing on poly for that keyword");
+                    Toast toast = Toast.makeText(MainActivity.this, getString(R.string.nothingForKeyword), Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                }
+                else {
+                    List<Item> items = Parser.parseListAssets(response);
+                    adapter = new ItemAdapter(items);
+                    adapter.setSelected(items.get(0));
+                    recyclerView.setAdapter(adapter);
+                }
+            }
+
+            @Override
+            public void failedResponse(Exception ex) {
+                Log.d(TAG, "Retrofit failed");
+                if(ex != null) ex.printStackTrace();
+
+                Toast toast = Toast.makeText(MainActivity.this, "Network request failed. Please try again.", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            }
+        });
     }
 
 
@@ -140,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
                 .setView(search)
                 .setPositiveButton("Search", (dialog, which) -> {
                     String keyword = editText.getText().toString();
-                    callAPIWithKeyword(keyword);
+                    PolyAPI.callAPIWithKeyword(keyword);
                 })
                 .setCancelable(true)
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
@@ -152,61 +179,5 @@ public class MainActivity extends AppCompatActivity {
         editText.requestFocus();
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         alertDialog.show();
-    }
-
-    private void callAPIWithKeyword(String keyword) {
-
-        Uri.Builder uriBuilder = new Uri.Builder()
-                .scheme("https")
-                .authority("poly.googleapis.com")
-                .appendPath("v1")
-                .appendPath("assets")
-                .appendQueryParameter("key", APIKey)
-                .appendQueryParameter("curated", Boolean.toString(true))
-                .appendQueryParameter("format", "GLTF2")
-                .appendQueryParameter("pageSize", "40");
-
-        if(keyword != null && !keyword.isEmpty()){
-            uriBuilder.appendQueryParameter("keywords", keyword);
-        }
-
-        String url = uriBuilder.build().toString();
-
-        Log.d(TAG, "Url for data: " + url);
-
-        PolyAPICall = PolyAPI.getApiInterface().getListAssets(url);
-        APICallPolyResponse();
-    }
-
-    private void APICallPolyResponse() {
-        PolyAPICall.enqueue(new Callback<PolyResponse>() {
-            @Override
-            public void onResponse(Call<PolyResponse> call, Response<PolyResponse> response) {
-                if(response.isSuccessful()) {
-                    if(response.body().isEmpty()){
-                        Log.d(TAG, "Nothing on poly for that keyword");
-                        Toast toast = Toast.makeText(MainActivity.this, getString(R.string.nothingForKeyword), Toast.LENGTH_SHORT);
-                        toast.setGravity(Gravity.CENTER, 0, 0);
-                        toast.show();
-                    }
-                    else {
-                        List<Item> items = Parser.parseListAssets(response.body());
-                        adapter = new ItemAdapter(items);
-                        adapter.setSelected(items.get(0));
-                        recyclerView.setAdapter(adapter);
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<PolyResponse> call, Throwable t) {
-                Log.d(TAG, "Retrofit failed");
-                t.printStackTrace();
-
-                Toast toast = Toast.makeText(MainActivity.this, "Network request failed. Please try again.", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
-            }
-        });
     }
 }

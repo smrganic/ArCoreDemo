@@ -6,9 +6,10 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+
 public class ItemHolder extends RecyclerView.ViewHolder {
 
-    private static final int SELECTED_VALUE = Color.BLACK;
+    private static final int SELECTED_VALUE = Color.parseColor("#ffb26c");
     private static final int DESELECTED_VALUE = Color.WHITE;
 
     private ItemAdapter adapter;
