@@ -2,7 +2,7 @@ package com.ArCoreDemo.mrganic.activity;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -23,11 +23,7 @@ import com.ArCoreDemo.mrganic.recycler.ItemAdapter;
 import com.ArCoreDemo.mrganic.retrofit.PolyAPI;
 import com.ArCoreDemo.mrganic.utils.Parser;
 import com.ArCoreDemo.mrganic.retrofit.PolyResponse;
-import com.ArCoreDemo.mrganic.utils.SceneHelper;
 import com.ArCoreDemo.mrganic.utils.Utility;
-import com.google.ar.core.exceptions.CameraNotAvailableException;
-import com.google.ar.sceneform.FrameTime;
-import com.google.ar.sceneform.Scene;
 
 import java.util.List;
 
@@ -43,9 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private Button button3D;
     private Button buttonSearch;
     private RecyclerView recyclerView;
-
-    SceneHelper sceneHelper;
-
+    private ItemAdapter adapter;
     private String selectedObject;
 
     private String APIKey;
@@ -57,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         APIKey = getString(R.string.apiKey);
+        callAPIWithKeyword("");
         setupRecycler();
-        setupScene();
         setupButtons();
     }
 
@@ -66,56 +60,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        try { sceneHelper.getSceneView().resume(); }
-        catch (CameraNotAvailableException e){
-            Log.e(TAG, "Something went wrong on resume " + e);
-            e.printStackTrace();
-        }
     }
 
 
     @Override
     protected void onPause() {
         super.onPause();
-        sceneHelper.getSceneView().pause();
     }
 
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        sceneHelper.getSceneView().destroy();
-        sceneHelper = null;
     }
 
 
     private void setupRecycler() {
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         recyclerView = findViewById(R.id.recycleView);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerView.setLayoutManager(layoutManager);
-    }
-
-
-    private void setupScene() {
-        // Setup scene needed to display models --> See SceneHelper.class
-        sceneHelper = new SceneHelper(findViewById(R.id.scene_view), this);
-        sceneHelper.getScene().addOnUpdateListener(new Scene.OnUpdateListener() {
-            @Override
-            public void onUpdate(FrameTime frameTime) {
-                if(recyclerView.getAdapter() != null && recyclerView.getAdapter().getItemCount() != 0) {
-                    String modelUrl = ((ItemAdapter) recyclerView.getAdapter()).getSelected().getModelUrl();
-                    if(selectedObject != null && selectedObject.equals(modelUrl)){
-                        return;
-                    }
-                    selectedObject = modelUrl;
-                    Toast toast = Toast.makeText(MainActivity.this,"Loading model", Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.CENTER, 0,0);
-                    toast.show();
-                    sceneHelper.renderObject(modelUrl);
-                }
-            }
-        });
     }
 
 
@@ -131,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
     private void setARListeners() {
         button3D.setOnClickListener(v -> {
             //Creates new intent with source -> destination and starts new activity
-            if(selectedObject != null){
+            if(adapter != null){
+                selectedObject = adapter.getSelected().getModelUrl();
                 Intent arIntent = new Intent(MainActivity.this, ArActivity.class);
                 arIntent.putExtra("fileName", selectedObject);
                 startActivity(arIntent);
@@ -147,7 +111,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void setNonArListeners() {
         button3D.setOnClickListener(v -> {
-            if(selectedObject != null){
+            if(adapter != null){
+                selectedObject = adapter.getSelected().getModelUrl();
                 Intent sceneViewerIntent = new Intent(Intent.ACTION_VIEW);
                 sceneViewerIntent.setData(Uri.parse(selectedObject));
                 sceneViewerIntent.setPackage("com.google.android.googlequicksearchbox");
@@ -199,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
                 .appendQueryParameter("key", APIKey)
                 .appendQueryParameter("curated", Boolean.toString(true))
                 .appendQueryParameter("format", "GLTF2")
-                .appendQueryParameter("pageSize", "30");
+                .appendQueryParameter("pageSize", "40");
 
         if(keyword != null && !keyword.isEmpty()){
             uriBuilder.appendQueryParameter("keywords", keyword);
@@ -226,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     else {
                         List<Item> items = Parser.parseListAssets(response.body());
-                        ItemAdapter adapter = new ItemAdapter(items);
+                        adapter = new ItemAdapter(items);
                         adapter.setSelected(items.get(0));
                         recyclerView.setAdapter(adapter);
                     }

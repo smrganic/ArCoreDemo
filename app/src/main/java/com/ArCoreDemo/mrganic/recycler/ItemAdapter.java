@@ -32,8 +32,10 @@ public class ItemAdapter extends RecyclerView.Adapter {
         ImageView iv = new ImageView(parent.getContext());
 
         //Sets the parameters of the image view
-        FrameLayout.LayoutParams layoutParams =
-                new FrameLayout.LayoutParams(250, 250);
+        FrameLayout.LayoutParams
+                layoutParams = new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.WRAP_CONTENT,
+                        FrameLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(4,4,4,4);
 
         iv.setPadding(8,8,8,8);
