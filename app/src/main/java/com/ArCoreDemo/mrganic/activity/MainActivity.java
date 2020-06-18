@@ -109,6 +109,9 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                     selectedObject = modelUrl;
+                    Toast toast = Toast.makeText(MainActivity.this,"Loading model", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0,0);
+                    toast.show();
                     sceneHelper.renderObject(modelUrl);
                 }
             }

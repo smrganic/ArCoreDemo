@@ -41,10 +41,6 @@ public class ItemHolder extends RecyclerView.ViewHolder {
             adapter.setSelected(item);
             itemView.setSelected(true);
             itemView.setBackgroundColor(SELECTED_VALUE);
-        } else {
-            adapter.setSelected(null);
-            itemView.setSelected(false);
-            itemView.setBackgroundColor(DESELECTED_VALUE);
         }
     }
 }
