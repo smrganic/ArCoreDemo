@@ -10,8 +10,6 @@ import java.util.List;
 
 public abstract class Parser {
 
-    private static final String TAG = "Parser";
-
     public static List<Item> parseListAssets(PolyResponse responseBody) {
 
         List<Item> items = new ArrayList<>();

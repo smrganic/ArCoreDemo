@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -25,13 +24,10 @@ import com.ArCoreDemo.mrganic.retrofit.PolyAPI;
 import com.ArCoreDemo.mrganic.utils.Parser;
 import com.ArCoreDemo.mrganic.retrofit.PolyResponse;
 import com.ArCoreDemo.mrganic.utils.SceneHelper;
-import com.google.ar.core.ArCoreApk;
+import com.ArCoreDemo.mrganic.utils.Utility;
 import com.google.ar.core.exceptions.CameraNotAvailableException;
 import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Scene;
-import com.google.ar.sceneform.assets.RenderableSource;
-import com.google.ar.sceneform.math.Vector3;
-import com.google.ar.sceneform.rendering.ModelRenderable;
 
 import java.util.List;
 
@@ -102,9 +98,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setupScene() {
+        // Setup scene needed to display models --> See SceneHelper.class
         sceneHelper = new SceneHelper(findViewById(R.id.scene_view), this);
-        // Setup scene needed to display models
-
         sceneHelper.getScene().addOnUpdateListener(new Scene.OnUpdateListener() {
             @Override
             public void onUpdate(FrameTime frameTime) {
@@ -114,60 +109,19 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                     selectedObject = modelUrl;
-                    renderObject(modelUrl);
+                    sceneHelper.renderObject(modelUrl);
                 }
             }
         });
-    }
-
-    private void renderObject(String modelUrl) {
-
-        Log.d(TAG, "URL for object render: " + modelUrl);
-
-        RenderableSource source = RenderableSource
-                .builder()
-                .setSource(sceneHelper.getSceneView().getContext(), Uri.parse(modelUrl), RenderableSource.SourceType.GLTF2)
-                .setRecenterMode(RenderableSource.RecenterMode.ROOT)
-                .setScale(0.25f)
-                .build();
-
-        ModelRenderable
-                .builder()
-                .setSource(sceneHelper.getSceneView().getContext(), source)
-                .build()
-                .thenAccept(MainActivity.this::updateNode);
-
-        selectedObject = modelUrl;
-    }
-
-
-    private void updateNode(ModelRenderable modelRenderable) {
-        sceneHelper.getTransformableNode().getScaleController().setEnabled(true);
-        sceneHelper.getTransformableNode().getTranslationController().setEnabled(true);
-        sceneHelper.getTransformableNode().setRenderable(modelRenderable);
-        sceneHelper.getTransformableNode().setLocalPosition(new Vector3(0f,0f,-1f));
     }
 
 
     private void setupButtons() {
         button3D = findViewById(R.id.btnEnter3D);
         buttonSearch = findViewById(R.id.btnSearchPoly);
-        checkIfPhoneIsArCompatible();
+        if(Utility.ArCompatible(this)) { setARListeners(); }
+        else { setNonArListeners(); }
         buttonSearch.setOnClickListener(this::onSearch);
-    }
-
-
-    private void checkIfPhoneIsArCompatible() {
-        ArCoreApk.Availability availability = ArCoreApk.getInstance().checkAvailability(this);
-        if(availability.isTransient()) {
-            new Handler().postDelayed(this::checkIfPhoneIsArCompatible, 200);
-        }
-        if(availability.isSupported()){
-            setARListeners();
-        }
-        else {
-            setNonArListeners();
-        }
     }
 
 
