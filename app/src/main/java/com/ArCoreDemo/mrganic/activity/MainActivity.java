@@ -1,5 +1,6 @@
 package com.ArCoreDemo.mrganic.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -8,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -32,10 +35,14 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
+
+    private static final String LAYOUT_MANAGER_STATE = "LAYOUT_MANAGER_STATE";
+
     private Button button3D;
     private Button buttonSearch;
     private RecyclerView recyclerView;
     private ItemAdapter adapter;
+    private GridLayoutManager layoutManager;
     private String selectedObject;
 
 
@@ -47,25 +54,6 @@ public class MainActivity extends AppCompatActivity {
         setupRecycler();
         setupButtons();
     }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
 
     private void setupAPI() {
         PolyAPI.setAPIKey(getString(R.string.apiKey));
@@ -103,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setupRecycler() {
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+        layoutManager = new GridLayoutManager(this, 2);
         recyclerView = findViewById(R.id.recycleView);
         recyclerView.setLayoutManager(layoutManager);
     }
