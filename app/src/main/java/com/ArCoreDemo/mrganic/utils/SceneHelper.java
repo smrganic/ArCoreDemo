@@ -1,113 +1,115 @@
 package com.ArCoreDemo.mrganic.utils;
 
-import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-
-import com.google.ar.sceneform.ArSceneView;
-import com.google.ar.sceneform.HitTestResult;
+import com.ArCoreDemo.mrganic.CustomArFragment;
+import com.google.ar.core.Anchor;
+import com.google.ar.core.Plane;
+import com.google.ar.core.TrackingState;
+import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.Scene;
-import com.google.ar.sceneform.SceneView;
 import com.google.ar.sceneform.assets.RenderableSource;
-import com.google.ar.sceneform.collision.Box;
-import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
-import com.google.ar.sceneform.ux.FootprintSelectionVisualizer;
+import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
-import com.google.ar.sceneform.ux.TransformationSystem;
 
-//TODO this entire thing
+import java.util.List;
+
 public class SceneHelper {
 
     private static final String TAG = "SceneHelper";
 
-    private Context context;
-    private SceneView sceneView;
+    private CustomArFragment fragment;
+    private Anchor anchor;
+    private ModelRenderable modelRenderable;
     private Scene scene;
-    private TransformationSystem transformationSystem;
-    private TransformableNode transformableNode;
 
 
-    public SceneHelper(SceneView viewById, Context context) {
-        this.sceneView = viewById;
-        scene = sceneView.getScene();
-        this.context = context;
+    public SceneHelper(CustomArFragment fragment) {
+        this.fragment = fragment;
+        this.scene = fragment.getArSceneView().getScene();
+        setupFragment();
+    }
 
-        //Todo sceneView transformations
-        scene.addOnPeekTouchListener(new Scene.OnPeekTouchListener() {
-            @Override
-            public void onPeekTouch(HitTestResult hitTestResult, MotionEvent motionEvent) {
-                transformationSystem.onTouch(hitTestResult, motionEvent);
+    private void setupFragment() {
+
+        //This handles taps on ArPlane
+        fragment.setOnTapArPlaneListener((hitResult, plane, motionEvent) -> {
+
+            //Creating anchor
+            Anchor anchor = hitResult.createAnchor();
+            AnchorNode anchorNode = new AnchorNode(anchor);
+            anchorNode.setParent(fragment.getArSceneView().getScene());
+
+            //Create transformable object and add it to anchor from above
+            TransformableNode object = new TransformableNode(fragment.getTransformationSystem());
+            object.setRenderable(modelRenderable);
+            object.getScaleController().setMinScale(0.3f);
+            object.getScaleController().setMaxScale(0.7f);
+            object.setParent(anchorNode);
+            object.select();
+
+            /*int size = scene.getChildren().size();
+            if(size > 3){
+                for(int i = 0; i < size; i++) {
+                    if(scene.getChildren().get(i) instanceof AnchorNode) {
+                        ((AnchorNode) scene.getChildren().get(i)).getAnchor().detach();
+                        break;
+                    }
+                }
+            }*/
+        });
+
+        //This runs on every frame
+        fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
+            //
+            if(anchor == null){
+                for(Plane plane : fragment.getArSceneView().getSession().getAllTrackables(Plane.class)){
+
+                    //Second if because sometimes two planes would exist at the same time
+
+                    if(anchor == null){
+                        if(plane.getTrackingState() == TrackingState.TRACKING && plane.getType().equals(Plane.Type.HORIZONTAL_UPWARD_FACING)){
+                            anchor = plane.createAnchor(plane.getCenterPose());
+                            AnchorNode anchorNode = new AnchorNode(anchor);
+                            anchorNode.setParent(fragment.getArSceneView().getScene());
+
+                            TransformableNode object = new TransformableNode(fragment.getTransformationSystem());
+                            object.setRenderable(modelRenderable);
+                            object.getScaleController().setMinScale(0.3f);
+                            object.getScaleController().setMaxScale(0.7f);
+                            object.setParent(anchorNode);
+                            object.select();
+                        }
+                    }
+                    else break;
+
+                }
             }
         });
-        //addTransformations();
     }
 
-    /*public void addTransformations() {
-        transformationSystem = new TransformationSystem(context.getResources().getDisplayMetrics(), new FootprintSelectionVisualizer());
-        transformableNode = new TransformableNode(transformationSystem);
-        transformableNode.setParent(scene);
+    //Getting GLTF2 object from the internet using URI and constructing modelRenderable
+    public void renderObject(Uri selectedObject) {
 
-        transformableNode.getScaleController().setEnabled(true);
-        transformableNode.getRotationController().setEnabled(true);
-        transformableNode.getTranslationController().setEnabled(false);
+        Log.d(TAG, "URL for object render: " + selectedObject.toString());
 
-        transformableNode.select();
-    }*/
-
-    public Scene getScene() {
-        return scene;
-    }
-
-    public SceneView getSceneView() {
-        return sceneView;
-    }
-
-    public TransformableNode getTransformableNode() {
-        return transformableNode;
-    }
-
-    public void renderObject(String modelUrl) {
-
-        Log.d(TAG, "URL for object render: " + modelUrl);
-
-        RenderableSource source = RenderableSource
-                .builder()
-                .setSource(sceneView.getContext(), Uri.parse(modelUrl), RenderableSource.SourceType.GLTF2)
+        RenderableSource source = RenderableSource.builder()
+                .setSource(
+                        fragment.getArSceneView().getContext(),
+                        selectedObject,
+                        RenderableSource.SourceType.GLTF2)
                 .setRecenterMode(RenderableSource.RecenterMode.ROOT)
-                .setScale(0.25f)
                 .build();
 
-        ModelRenderable
-                .builder()
-                .setSource(sceneView.getContext(), source)
+        ModelRenderable.builder()
+                .setSource(fragment.getContext(), source)
                 .build()
-                .thenAccept(this::updateNode);
-    }
-
-
-    private void updateNode(ModelRenderable modelRenderable) {
-        transformableNode.setRenderable(modelRenderable);
-        limitSize(0.1f, 0.3f);
-    }
-
-    private void limitSize(float minSize, float maxSize) {
-        Box modelBox = (Box) transformableNode.getCollisionShape();
-        Vector3 size = modelBox.getSize();
-        float maxDim = Math.max(size.x, Math.max(size.y, size.z));
-        float currentScale = transformableNode.getWorldScale().x;
-
-        // Assume all dimensions have the same scale.
-        float currentSize = maxDim * currentScale;
-        float newScale = currentScale;
-        if (currentSize < minSize) {
-            newScale = newScale * (minSize/currentSize);
-        } else if (currentSize > maxSize) {
-            newScale = newScale * (maxSize/currentSize);
-        }
-        transformableNode.setWorldScale(new Vector3(newScale, newScale, newScale));
-
+                .thenAccept(object3D -> modelRenderable = object3D)
+                .exceptionally(
+                        throwable -> {
+                            Log.d(TAG, "Failed to load ModelRenderable");
+                            return null;
+                        });
     }
 }

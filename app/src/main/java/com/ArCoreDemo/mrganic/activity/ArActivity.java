@@ -5,29 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 
 import com.ArCoreDemo.mrganic.R;
 import com.ArCoreDemo.mrganic.CustomArFragment;
-import com.google.ar.core.Anchor;
-import com.google.ar.core.Plane;
-import com.google.ar.core.TrackingState;
-import com.google.ar.sceneform.AnchorNode;
-import com.google.ar.sceneform.FrameTime;
-import com.google.ar.sceneform.Scene;
-import com.google.ar.sceneform.assets.RenderableSource;
-import com.google.ar.sceneform.rendering.ModelRenderable;
-import com.google.ar.sceneform.ux.TransformableNode;
+import com.ArCoreDemo.mrganic.utils.SceneHelper;
 
 public class ArActivity extends AppCompatActivity {
 
     private static final String TAG = "ArActivity";
-    private ModelRenderable modelRenderable;
-    private CustomArFragment fragment;
-    private Button button;
-    private Plane plane;
-    private Anchor anchor = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,27 +22,10 @@ public class ArActivity extends AppCompatActivity {
         init();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        fragment.onResume();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        fragment.onDestroy();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        fragment.onPause();
-    }
-
     private void init() {
 
-        button = findViewById(R.id.btnSearchPoly);
+        //Initialising back button
+        Button button = findViewById(R.id.btnSearchPoly);
         button.setOnClickListener(v -> finish());
 
         //Get selected object from intent
@@ -64,65 +33,10 @@ public class ArActivity extends AppCompatActivity {
         Uri selectedObject = Uri.parse(intent.getStringExtra("fileName"));
 
         //Setting up SceneForm with ArFragment using ArCore
-        fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
+        CustomArFragment fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
 
-        RenderableSource source = RenderableSource.builder()
-                .setSource(
-                        fragment.getArSceneView().getContext(),
-                        selectedObject,
-                        RenderableSource.SourceType.GLTF2)
-                .setRecenterMode(RenderableSource.RecenterMode.ROOT)
-                .build();
-
-        ModelRenderable.builder()
-                .setSource(this, source)
-                .build()
-                .thenAccept(object3D -> modelRenderable = object3D)
-                .exceptionally(
-                        throwable -> {
-                            Log.d(TAG, "Failed to load ModelRenderable");
-                            return null;
-                        });
-
-        fragment.getArSceneView().getScene().addOnUpdateListener(new Scene.OnUpdateListener() {
-            @Override
-            public void onUpdate(FrameTime frameTime) {
-                if(anchor == null){
-                    for(Plane plane : fragment.getArSceneView().getSession().getAllTrackables(Plane.class)){
-                        if(plane.getTrackingState() == TrackingState.TRACKING){
-                            anchor = plane.createAnchor(plane.getCenterPose());
-                            AnchorNode anchorNode = new AnchorNode(anchor);
-                            anchorNode.setParent(fragment.getArSceneView().getScene());
-
-                            //Create transformable object and add it to anchor from above
-                            TransformableNode object = new TransformableNode(fragment.getTransformationSystem());
-                            object.setRenderable(modelRenderable);
-                            object.getScaleController().setMinScale(0.3f);
-                            object.getScaleController().setMaxScale(0.7f);
-                            object.setParent(anchorNode);
-                            object.select();
-                        }
-                    }
-                }
-            }
-        });
-
-
-        fragment.setOnTapArPlaneListener((hitResult, plane, motionEvent) -> {
-            if(modelRenderable == null) return;
-
-            //Creating anchor
-            anchor = hitResult.createAnchor();
-            AnchorNode anchorNode = new AnchorNode(anchor);
-            anchorNode.setParent(fragment.getArSceneView().getScene());
-
-            //Create transformable object and add it to anchor from above
-            TransformableNode object = new TransformableNode(fragment.getTransformationSystem());
-            object.setRenderable(modelRenderable);
-            object.getScaleController().setMinScale(0.3f);
-            object.getScaleController().setMaxScale(0.7f);
-            object.setParent(anchorNode);
-            object.select();
-    });
+        //Delegating rendering away from parent activity
+        SceneHelper sceneHelper = new SceneHelper(fragment);
+        sceneHelper.renderObject(selectedObject);
     }
 }
