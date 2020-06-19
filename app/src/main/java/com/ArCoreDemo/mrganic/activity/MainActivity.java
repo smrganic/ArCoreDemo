@@ -40,9 +40,12 @@ public class MainActivity extends AppCompatActivity {
 
     private Button button3D;
     private Button buttonSearch;
+
     private RecyclerView recyclerView;
     private ItemAdapter adapter;
     private GridLayoutManager layoutManager;
+    private Parcelable layoutManagerState;
+
     private String selectedObject;
 
 

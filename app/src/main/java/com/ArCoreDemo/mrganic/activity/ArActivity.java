@@ -6,15 +6,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ActionMode;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.Button;
 
 import com.ArCoreDemo.mrganic.R;
 import com.ArCoreDemo.mrganic.CustomArFragment;
 import com.google.ar.core.Anchor;
-import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.core.TrackingState;
 import com.google.ar.sceneform.AnchorNode;
@@ -22,7 +18,6 @@ import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.rendering.ModelRenderable;
-import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
 
 public class ArActivity extends AppCompatActivity {
@@ -62,13 +57,7 @@ public class ArActivity extends AppCompatActivity {
     private void init() {
 
         button = findViewById(R.id.btnSearchPoly);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent arIntent = new Intent(ArActivity.this, MainActivity.class);
-                startActivity(arIntent);
-            }
-        });
+        button.setOnClickListener(v -> finish());
 
         //Get selected object from intent
         Intent intent = getIntent();

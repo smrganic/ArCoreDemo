@@ -3,4 +3,7 @@
     <string name="noModels">Models need to be loaded first</string>
     <string name="keywords">Keywords</string>
     <string name="nothingForKeyword">No models for that keyword. Try something else.</string>
+    <string name="back">Back</string>
+    <string name="search_models">Search Models</string>
+    <string name="view_in_3d">View in 3D</string>
 </resources>
