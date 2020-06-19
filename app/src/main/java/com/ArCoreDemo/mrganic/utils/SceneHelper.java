@@ -49,15 +49,19 @@ public class SceneHelper {
             object.setParent(anchorNode);
             object.select();
 
-            /*int size = scene.getChildren().size();
-            if(size > 3){
-                for(int i = 0; i < size; i++) {
+            int count = 0;
+            for(int i=0;i<scene.getChildren().size();i++){
+                if(scene.getChildren().get(i) instanceof AnchorNode) count++;
+            }
+
+            if(count > 5){
+                for(int i = 0; i < scene.getChildren().size(); i++) {
                     if(scene.getChildren().get(i) instanceof AnchorNode) {
-                        ((AnchorNode) scene.getChildren().get(i)).getAnchor().detach();
+                        ((AnchorNode) scene.getChildren().get(i)).setParent(null);
                         break;
                     }
                 }
-            }*/
+            }
         });
 
         //This runs on every frame
