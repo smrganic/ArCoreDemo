@@ -6,20 +6,21 @@
     android:layout_height="match_parent"
     tools:context=".activity.ArActivity">
 
-    <fragment android:name="com.ArCoreDemo.mrganic.CustomArFragment"
-    android:id="@+id/ux_fragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    <fragment
+        android:id="@+id/ux_fragment"
+        android:name="com.ArCoreDemo.mrganic.utils.CustomArFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <Button
+        android:id="@+id/btnSearchPoly"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/btnSearchPoly"
-        android:text="@string/back"
+        android:layout_marginBottom="32dp"
         android:background="@drawable/arbutton"
+        android:text="@string/back"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginBottom="32dp"/>
+        app:layout_constraintRight_toRightOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

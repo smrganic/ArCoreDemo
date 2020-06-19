@@ -1,33 +1,42 @@
 package com.ArCoreDemo.mrganic.utils;
 
+import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
-import com.ArCoreDemo.mrganic.CustomArFragment;
+
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Plane;
 import com.google.ar.core.TrackingState;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.Camera;
+import com.google.ar.sceneform.FrameTime;
+import com.google.ar.sceneform.HitTestResult;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.assets.RenderableSource;
+import com.google.ar.sceneform.collision.Ray;
 import com.google.ar.sceneform.rendering.ModelRenderable;
-import com.google.ar.sceneform.ux.BaseArFragment;
 import com.google.ar.sceneform.ux.TransformableNode;
-
-import java.util.List;
 
 public class SceneHelper {
 
     private static final String TAG = "SceneHelper";
 
     private CustomArFragment fragment;
+    private Scene scene;
+    private Camera camera;
     private Anchor anchor;
     private ModelRenderable modelRenderable;
-    private Scene scene;
+    private int numberOfAnchorNodes = 0;
+    private boolean flag = false;
 
 
     public SceneHelper(CustomArFragment fragment) {
         this.fragment = fragment;
         this.scene = fragment.getArSceneView().getScene();
+        this.camera = scene.getCamera();
         setupFragment();
     }
 
@@ -48,16 +57,13 @@ public class SceneHelper {
             object.getScaleController().setMaxScale(0.7f);
             object.setParent(anchorNode);
             object.select();
+            numberOfAnchorNodes++;
 
-            int count = 0;
-            for(int i=0;i<scene.getChildren().size();i++){
-                if(scene.getChildren().get(i) instanceof AnchorNode) count++;
-            }
-
-            if(count > 5){
-                for(int i = 0; i < scene.getChildren().size(); i++) {
-                    if(scene.getChildren().get(i) instanceof AnchorNode) {
-                        ((AnchorNode) scene.getChildren().get(i)).setParent(null);
+            if (numberOfAnchorNodes > 5) {
+                for (int i = 0; i < scene.getChildren().size(); i++) {
+                    if (scene.getChildren().get(i) instanceof AnchorNode) {
+                        scene.getChildren().get(i).setParent(null);
+                        numberOfAnchorNodes--;
                         break;
                     }
                 }
@@ -65,43 +71,56 @@ public class SceneHelper {
         });
 
         //This runs on every frame
-        fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
-            //
-            if(anchor == null){
-                for(Plane plane : fragment.getArSceneView().getSession().getAllTrackables(Plane.class)){
+        fragment.getArSceneView().getScene().addOnUpdateListener(this::onUpdate);
+    }
 
-                    //Second if because sometimes two planes would exist at the same time
+    private void onUpdate(FrameTime frameTime) {
+        //This ensure that this part runs only once
+        if (anchor == null) {
+            for (Plane plane : fragment.getArSceneView().getSession().getAllTrackables(Plane.class)) {
+                //Second if because sometimes two planes would exist at the same time
+                if (anchor == null) {
+                    //Ensures that the plane is horizontal and tracked
+                    if (plane.getTrackingState() == TrackingState.TRACKING && plane.getType().equals(Plane.Type.HORIZONTAL_UPWARD_FACING)) {
+                        anchor = plane.createAnchor(plane.getCenterPose());
+                        AnchorNode anchorNode = new AnchorNode(anchor);
+                        anchorNode.setParent(fragment.getArSceneView().getScene());
 
-                    if(anchor == null){
-                        if(plane.getTrackingState() == TrackingState.TRACKING && plane.getType().equals(Plane.Type.HORIZONTAL_UPWARD_FACING)){
-                            anchor = plane.createAnchor(plane.getCenterPose());
-                            AnchorNode anchorNode = new AnchorNode(anchor);
-                            anchorNode.setParent(fragment.getArSceneView().getScene());
-
-                            TransformableNode object = new TransformableNode(fragment.getTransformationSystem());
-                            object.setRenderable(modelRenderable);
-                            object.getScaleController().setMinScale(0.3f);
-                            object.getScaleController().setMaxScale(0.7f);
-                            object.setParent(anchorNode);
-                            object.select();
-                        }
+                        TransformableNode object = new TransformableNode(fragment.getTransformationSystem());
+                        object.setRenderable(modelRenderable);
+                        object.getScaleController().setMinScale(0.3f);
+                        object.getScaleController().setMaxScale(0.7f);
+                        object.setParent(anchorNode);
+                        object.select();
+                        numberOfAnchorNodes++;
                     }
-                    else break;
-
-                }
+                } else break;
             }
-        });
+        }
+
+        Ray ray = new Ray(camera.getWorldPosition(), camera.getForward());
+        HitTestResult hitTestResult = scene.hitTest(ray);
+        if (hitTestResult.getNode() != null && hitTestResult.getDistance() < 0.001) {
+            Vibrator vibrator = (Vibrator) fragment.getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                vibrator.vibrate(500);
+            }
+        }
     }
 
     //Getting GLTF2 object from the internet using URI and constructing modelRenderable
-    public void renderObject(Uri selectedObject) {
+    public void renderObject(String selectedObject) {
 
-        Log.d(TAG, "URL for object render: " + selectedObject.toString());
+        Log.d(TAG, "URL for object render: " + selectedObject);
+
+        Uri modelURI = Uri.parse(selectedObject);
 
         RenderableSource source = RenderableSource.builder()
                 .setSource(
                         fragment.getArSceneView().getContext(),
-                        selectedObject,
+                        modelURI,
                         RenderableSource.SourceType.GLTF2)
                 .setRecenterMode(RenderableSource.RecenterMode.ROOT)
                 .build();

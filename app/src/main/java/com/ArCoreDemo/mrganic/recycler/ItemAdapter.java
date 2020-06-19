@@ -34,15 +34,15 @@ public class ItemAdapter extends RecyclerView.Adapter {
         //Sets the parameters of the image view
         FrameLayout.LayoutParams
                 layoutParams = new FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.WRAP_CONTENT,
-                        FrameLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(4,4,4,4);
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(4, 4, 4, 4);
 
-        iv.setPadding(8,8,8,8);
+        iv.setPadding(8, 8, 8, 8);
         iv.setImageResource(R.drawable.ivplaceholder);
         iv.setCropToPadding(true);
         iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        
+
         iv.setLayoutParams(layoutParams);
 
         return new ItemHolder(iv, this);
@@ -50,7 +50,7 @@ public class ItemAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if(holder.getItemId() != position) {
+        if (holder.getItemId() != position) {
             ((ItemHolder) holder).setItem(items.get(position));
             items.get(position).setViewHolder(holder);
             ImageView iv = (ImageView) holder.itemView;
@@ -66,16 +66,14 @@ public class ItemAdapter extends RecyclerView.Adapter {
     }
 
     public Item getSelected() {
-        if(selected >= 0){
+        if (selected >= 0) {
             return items.get(selected);
-        }
-        else return null;
+        } else return null;
     }
 
     public void setSelected(Item item) {
-        if(item == null) {
+        if (item == null) {
             selected = -1;
-        }
-        else selected = items.indexOf(item);
+        } else selected = items.indexOf(item);
     }
 }

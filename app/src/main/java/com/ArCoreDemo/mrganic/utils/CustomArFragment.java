@@ -1,4 +1,4 @@
-package com.ArCoreDemo.mrganic;
+package com.ArCoreDemo.mrganic.utils;
 
 import com.google.ar.core.Config;
 import com.google.ar.core.Session;

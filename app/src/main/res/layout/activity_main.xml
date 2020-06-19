@@ -10,32 +10,31 @@
         android:id="@+id/recycleView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:id="@+id/btnEnter3D"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/btnEnter3D"
-        android:text="@string/view_in_3d"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/arbutton"
+        android:text="@string/view_in_3d"
         app:layout_constraintBottom_toTopOf="@+id/btnSearchPoly"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginBottom="16dp"/>
+        app:layout_constraintRight_toRightOf="parent" />
 
     <Button
+        android:id="@+id/btnSearchPoly"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/btnSearchPoly"
-        android:text="@string/search_models"
+        android:layout_marginBottom="32dp"
         android:background="@drawable/arbutton"
+        android:text="@string/search_models"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginBottom="32dp"/>
+        app:layout_constraintRight_toRightOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

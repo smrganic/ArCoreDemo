@@ -1,14 +1,13 @@
 package com.ArCoreDemo.mrganic.activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.ArCoreDemo.mrganic.utils.CustomArFragment;
 import com.ArCoreDemo.mrganic.R;
-import com.ArCoreDemo.mrganic.CustomArFragment;
 import com.ArCoreDemo.mrganic.utils.SceneHelper;
 
 public class ArActivity extends AppCompatActivity {
@@ -30,7 +29,7 @@ public class ArActivity extends AppCompatActivity {
 
         //Get selected object from intent
         Intent intent = getIntent();
-        Uri selectedObject = Uri.parse(intent.getStringExtra("fileName"));
+        String selectedObject = intent.getStringExtra("fileName");
 
         //Setting up SceneForm with ArFragment using ArCore
         CustomArFragment fragment = (CustomArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);

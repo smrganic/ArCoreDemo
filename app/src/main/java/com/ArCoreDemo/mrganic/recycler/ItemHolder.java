@@ -20,14 +20,13 @@ public class ItemHolder extends RecyclerView.ViewHolder {
         this.adapter = adapter;
     }
 
-    public void setItem(Item item){
+    public void setItem(Item item) {
         this.item = item;
         itemView.setOnClickListener(this::onClick);
-        if(item.equals(adapter.getSelected())) {
+        if (item.equals(adapter.getSelected())) {
             itemView.setSelected(true);
             itemView.setBackgroundColor(SELECTED_VALUE);
-        }
-        else {
+        } else {
             itemView.setSelected(false);
             itemView.setBackgroundColor(DESELECTED_VALUE);
         }

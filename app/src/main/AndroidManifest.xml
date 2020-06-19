@@ -5,6 +5,7 @@
     <!-- Both "AR Optional" and "AR Required" apps require CAMERA permission. -->
     <uses-permission android:name="android.permission.CAMERA" /> <!-- Sceneform requires OpenGL ES 3.0 or later. -->
     <uses-permission android:name="android.permission.INTERNET" /> <!-- Poly API needs an internet connection -->
+    <uses-permission android:name="android.permission.VIBRATE"/> <!-- Needed for object collision -->
 
     <uses-feature
         android:glEsVersion="0x00030000"
