@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -59,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
     private void setupAPI() {
         PolyAPI.setAPIKey(getString(R.string.apiKey));
 
+        snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.loadingModels));
+
         PolyAPI.callAPIWithKeyword("");
 
         PolyAPI.setCallBackListener(new CallBackListener() {
@@ -68,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Nothing on poly for that keyword");
                     snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.nothingForKeyword));
                 } else {
-                    snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.loadingModels));
                     List<Item> items = Parser.parseListAssets(response);
                     adapter = new ItemAdapter(items);
                     adapter.setSelected(items.get(0));
@@ -137,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Creates a new search dialog and calls Poly API using keyword
     private void onSearch(View view) {
+
         View search = this
                 .getLayoutInflater()
                 .inflate(R.layout.search_popup, (ViewGroup) view.getParent(), false);
@@ -148,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 .setView(search)
                 .setPositiveButton("Search", (dialog, which) -> {
                     String keyword = editText.getText().toString();
+                    snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.loadingModels));
                     PolyAPI.callAPIWithKeyword(keyword);
                 })
                 .setCancelable(true)
@@ -158,6 +162,17 @@ public class MainActivity extends AppCompatActivity {
         //This auto selects the edit text
         //and shows keyboard
         editText.requestFocus();
+        editText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if(event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER){
+                    PolyAPI.callAPIWithKeyword(editText.getText().toString());
+                    alertDialog.dismiss();
+                    return true;
+                }
+                return false;
+            }
+        });
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         alertDialog.show();
     }

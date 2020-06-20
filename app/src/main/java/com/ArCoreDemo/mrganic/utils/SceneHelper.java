@@ -20,6 +20,7 @@ import com.google.ar.sceneform.HitTestResult;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.collision.Ray;
+import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.ux.TransformableNode;
 
@@ -105,6 +106,7 @@ public class SceneHelper {
         object.setRenderable(modelRenderable);
         object.getScaleController().setMinScale(0.3f);
         object.getScaleController().setMaxScale(0.65f);
+        object.setWorldScale(Vector3.one());
         object.setParent(anchorNode);
         object.select();
         numberOfAnchorNodes++;
