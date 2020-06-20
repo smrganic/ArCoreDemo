@@ -91,7 +91,7 @@ public class SceneHelper {
 
     private void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
 
-        if (numberOfAnchorNodes == 1) {
+        if (numberOfAnchorNodes == 0) {
             snackBarHelper.showTimedMessage(fragment.getActivity(), fragment.getString(R.string.nodeInstruction));
         }
 
