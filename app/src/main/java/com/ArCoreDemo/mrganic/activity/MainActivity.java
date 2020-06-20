@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupAPI() {
         PolyAPI.setAPIKey(getString(R.string.apiKey));
 
-        snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.loadingModels));
+        snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.searchingModels));
 
         PolyAPI.callAPIWithKeyword("");
 
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 .setView(search)
                 .setPositiveButton("Search", (dialog, which) -> {
                     String keyword = editText.getText().toString();
-                    snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.loadingModels));
+                    snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.searchingModels));
                     PolyAPI.callAPIWithKeyword(keyword);
                 })
                 .setCancelable(true)
@@ -162,16 +162,13 @@ public class MainActivity extends AppCompatActivity {
         //This auto selects the edit text
         //and shows keyboard
         editText.requestFocus();
-        editText.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if(event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER){
-                    PolyAPI.callAPIWithKeyword(editText.getText().toString());
-                    alertDialog.dismiss();
-                    return true;
-                }
-                return false;
+        editText.setOnKeyListener((v, keyCode, event) -> {
+            if(event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER){
+                PolyAPI.callAPIWithKeyword(editText.getText().toString());
+                alertDialog.dismiss();
+                return true;
             }
+            return false;
         });
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         alertDialog.show();

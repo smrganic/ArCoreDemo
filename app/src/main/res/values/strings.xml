@@ -10,5 +10,5 @@
     <string name="tapInstruction">Tap on a plane to render model.</string>
     <string name="nodeInstruction">Pinch the model to resize. Drag to reposition.</string>
     <string name="networkError">Network request failed. Please try again.</string>
-    <string name="loadingModels">Loading models…</string>
+    <string name="searchingModels">Searching models…</string>
 </resources>

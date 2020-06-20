@@ -21,7 +21,9 @@ import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.collision.Ray;
 import com.google.ar.sceneform.math.Vector3;
+import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.ModelRenderable;
+import com.google.ar.sceneform.rendering.PlaneRenderer;
 import com.google.ar.sceneform.ux.TransformableNode;
 
 public class SceneHelper {
@@ -56,6 +58,15 @@ public class SceneHelper {
     private void onUpdate(FrameTime frameTime) {
         warnIfInsideObject(checkForCollision());
         showInstructions();
+        renderDetectedPlane();
+    }
+
+    private void renderDetectedPlane() {
+        PlaneRenderer planeRenderer = fragment.getArSceneView().getPlaneRenderer();
+        planeRenderer.getMaterial().thenAccept(material -> {material.setFloat(PlaneRenderer.MATERIAL_SPOTLIGHT_RADIUS, 100f);});
+
+        //Used for changing render matrix matrix color
+        //planeRenderer.getMaterial().thenAccept(material -> {material.setFloat3(PlaneRenderer.MATERIAL_COLOR, new Color(1f,0f,0f));});
     }
 
     private boolean checkForCollision() {
@@ -106,7 +117,7 @@ public class SceneHelper {
         object.setRenderable(modelRenderable);
         object.getScaleController().setMinScale(0.3f);
         object.getScaleController().setMaxScale(0.65f);
-        object.setWorldScale(Vector3.one());
+        object.setLocalScale(new Vector3(0.2f,0.2f,0.2f));
         object.setParent(anchorNode);
         object.select();
         numberOfAnchorNodes++;
