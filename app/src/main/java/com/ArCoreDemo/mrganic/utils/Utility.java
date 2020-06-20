@@ -1,7 +1,6 @@
 package com.ArCoreDemo.mrganic.utils;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Handler;
 
 import com.google.ar.core.ArCoreApk;

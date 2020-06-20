@@ -107,20 +107,24 @@ public class SceneHelper {
             snackBarHelper.showTimedMessage(fragment.getActivity(), fragment.getString(R.string.nodeInstruction));
         }
 
-        //Creating anchor and a node for the anchor
-        Anchor anchor = hitResult.createAnchor();
-        AnchorNode anchorNode = new AnchorNode(anchor);
-        anchorNode.setParent(fragment.getArSceneView().getScene());
+        //Limit object placement on horizontal planes
+        if(plane.getTrackingState() == TrackingState.TRACKING && plane.getType() == Plane.Type.HORIZONTAL_UPWARD_FACING) {
+            //Creating anchor and a node for the anchor
+            Anchor anchor = hitResult.createAnchor();
+            AnchorNode anchorNode = new AnchorNode(anchor);
+            anchorNode.setParent(fragment.getArSceneView().getScene());
 
-        //Create transformable object and add it to anchor from above
-        TransformableNode object = new TransformableNode(fragment.getTransformationSystem());
-        object.setRenderable(modelRenderable);
-        object.getScaleController().setMinScale(0.3f);
-        object.getScaleController().setMaxScale(0.65f);
-        object.setLocalScale(new Vector3(0.2f,0.2f,0.2f));
-        object.setParent(anchorNode);
-        object.select();
-        numberOfAnchorNodes++;
+            //Create transformable object and add it to anchor from above
+            TransformableNode object = new TransformableNode(fragment.getTransformationSystem());
+            object.setRenderable(modelRenderable);
+            object.getScaleController().setMinScale(0.3f);
+            object.getScaleController().setMaxScale(0.65f);
+            object.setLocalScale(new Vector3(0.2f,0.2f,0.2f));
+            object.setParent(anchorNode);
+            object.select();
+            numberOfAnchorNodes++;
+        }
+
 
         //This releases nodes so that the renderer doesn't get overloaded
         if (numberOfAnchorNodes > 5) {
