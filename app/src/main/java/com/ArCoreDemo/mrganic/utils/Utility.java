@@ -1,6 +1,7 @@
 package com.ArCoreDemo.mrganic.utils;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 
 import com.google.ar.core.ArCoreApk;
@@ -17,5 +18,9 @@ public abstract class Utility {
             }, 200);
         }
         return availability.isSupported();
+    }
+
+    public static boolean isBuildVesionHigherOrEqualTo(int versionNumber) {
+        return Build.VERSION.SDK_INT >= versionNumber;
     }
 }

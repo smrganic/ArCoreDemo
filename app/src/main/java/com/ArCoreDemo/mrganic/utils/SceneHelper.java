@@ -6,8 +6,11 @@ import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
+import android.view.MotionEvent;
 
+import com.ArCoreDemo.mrganic.R;
 import com.google.ar.core.Anchor;
+import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
 import com.google.ar.core.TrackingState;
 import com.google.ar.sceneform.AnchorNode;
@@ -23,89 +26,92 @@ import com.google.ar.sceneform.ux.TransformableNode;
 public class SceneHelper {
 
     private static final String TAG = "SceneHelper";
-
+    private final SnackBarHelper snackBarHelper;
     private CustomArFragment fragment;
     private Scene scene;
     private Camera camera;
-    private Anchor anchor;
     private ModelRenderable modelRenderable;
     private int numberOfAnchorNodes = 0;
-    private boolean flag = false;
 
 
     public SceneHelper(CustomArFragment fragment) {
         this.fragment = fragment;
         this.scene = fragment.getArSceneView().getScene();
         this.camera = scene.getCamera();
+        snackBarHelper = new SnackBarHelper();
+        snackBarHelper.showMessage(fragment.getActivity(), fragment.getString(R.string.searching));
         setupFragment();
     }
 
     private void setupFragment() {
 
-        //This handles taps on ArPlane
-        fragment.setOnTapArPlaneListener((hitResult, plane, motionEvent) -> {
-
-            //Creating anchor
-            Anchor anchor = hitResult.createAnchor();
-            AnchorNode anchorNode = new AnchorNode(anchor);
-            anchorNode.setParent(fragment.getArSceneView().getScene());
-
-            //Create transformable object and add it to anchor from above
-            TransformableNode object = new TransformableNode(fragment.getTransformationSystem());
-            object.setRenderable(modelRenderable);
-            object.getScaleController().setMinScale(0.3f);
-            object.getScaleController().setMaxScale(0.7f);
-            object.setParent(anchorNode);
-            object.select();
-            numberOfAnchorNodes++;
-
-            if (numberOfAnchorNodes > 5) {
-                for (int i = 0; i < scene.getChildren().size(); i++) {
-                    if (scene.getChildren().get(i) instanceof AnchorNode) {
-                        scene.getChildren().get(i).setParent(null);
-                        numberOfAnchorNodes--;
-                        break;
-                    }
-                }
-            }
-        });
-
         //This runs on every frame
-        fragment.getArSceneView().getScene().addOnUpdateListener(this::onUpdate);
+        scene.addOnUpdateListener(this::onUpdate);
+
+        //This handles taps on ArPlane
+        fragment.setOnTapArPlaneListener(this::onTapPlane);
     }
 
     private void onUpdate(FrameTime frameTime) {
-        //This ensure that this part runs only once
-        if (anchor == null) {
-            for (Plane plane : fragment.getArSceneView().getSession().getAllTrackables(Plane.class)) {
-                //Second if because sometimes two planes would exist at the same time
-                if (anchor == null) {
-                    //Ensures that the plane is horizontal and tracked
-                    if (plane.getTrackingState() == TrackingState.TRACKING && plane.getType().equals(Plane.Type.HORIZONTAL_UPWARD_FACING)) {
-                        anchor = plane.createAnchor(plane.getCenterPose());
-                        AnchorNode anchorNode = new AnchorNode(anchor);
-                        anchorNode.setParent(fragment.getArSceneView().getScene());
+        warnIfInsideObject(checkForCollision());
+        showInstructions();
+    }
 
-                        TransformableNode object = new TransformableNode(fragment.getTransformationSystem());
-                        object.setRenderable(modelRenderable);
-                        object.getScaleController().setMinScale(0.3f);
-                        object.getScaleController().setMaxScale(0.7f);
-                        object.setParent(anchorNode);
-                        object.select();
-                        numberOfAnchorNodes++;
-                    }
-                } else break;
-            }
-        }
-
-        Ray ray = new Ray(camera.getWorldPosition(), camera.getForward());
-        HitTestResult hitTestResult = scene.hitTest(ray);
-        if (hitTestResult.getNode() != null && hitTestResult.getDistance() < 0.001) {
+    private void warnIfInsideObject(boolean collision) {
+        if (collision) {
             Vibrator vibrator = (Vibrator) fragment.getActivity().getSystemService(Context.VIBRATOR_SERVICE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (Utility.isBuildVesionHigherOrEqualTo(Build.VERSION_CODES.O)) {
                 vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
             } else {
                 vibrator.vibrate(500);
+            }
+        }
+    }
+
+    private void showInstructions() {
+        if (snackBarHelper.isVisible() && snackBarHelper.getMessage().equals(fragment.getString(R.string.searching))) {
+            for (Plane plane : fragment.getArSceneView().getSession().getAllTrackables(Plane.class)) {
+                if (plane.getTrackingState() == TrackingState.TRACKING && plane.getType().equals(Plane.Type.HORIZONTAL_UPWARD_FACING)) {
+                    snackBarHelper.showDismissableMessage(fragment.getActivity(), fragment.getString(R.string.tapInstruction));
+                    break;
+                }
+            }
+        }
+    }
+
+    private boolean checkForCollision() {
+        //Checks if phone is closer than 1 millimeter to any node
+        Ray ray = new Ray(camera.getWorldPosition(), camera.getForward());
+        HitTestResult hitTestResult = scene.hitTest(ray);
+        return hitTestResult.getNode() != null && hitTestResult.getDistance() < 0.001;
+    }
+
+    private void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
+
+        snackBarHelper.hide(fragment.getActivity());
+
+        //Creating anchor and a node for the anchor
+        Anchor anchor = hitResult.createAnchor();
+        AnchorNode anchorNode = new AnchorNode(anchor);
+        anchorNode.setParent(fragment.getArSceneView().getScene());
+
+        //Create transformable object and add it to anchor from above
+        TransformableNode object = new TransformableNode(fragment.getTransformationSystem());
+        object.setRenderable(modelRenderable);
+        object.getScaleController().setMinScale(0.3f);
+        object.getScaleController().setMaxScale(0.65f);
+        object.setParent(anchorNode);
+        object.select();
+        numberOfAnchorNodes++;
+
+        //This releases nodes so that the renderer doesn't get overloaded
+        if (numberOfAnchorNodes > 5) {
+            for (int i = 0; i < scene.getChildren().size(); i++) {
+                if (scene.getChildren().get(i) instanceof AnchorNode) {
+                    scene.getChildren().get(i).setParent(null);
+                    numberOfAnchorNodes--;
+                    break;
+                }
             }
         }
     }

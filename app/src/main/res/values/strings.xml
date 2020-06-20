@@ -6,4 +6,6 @@
     <string name="back">Back</string>
     <string name="search_models">Search Models</string>
     <string name="view_in_3d">View in 3D</string>
+    <string name="searching">Point camera at the floor.</string>
+    <string name="tapInstruction">Tap on a plane to render model</string>
 </resources>

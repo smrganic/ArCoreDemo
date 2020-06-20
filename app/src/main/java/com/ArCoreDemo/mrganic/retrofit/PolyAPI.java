@@ -50,7 +50,7 @@ public abstract class PolyAPI implements CallBackListener {
                 .appendQueryParameter("format", "GLTF2")
                 .appendQueryParameter("pageSize", "40");
 
-        if(keyword != null && !keyword.isEmpty()){
+        if (keyword != null && !keyword.isEmpty()) {
             uriBuilder.appendQueryParameter("keywords", keyword);
         }
 
@@ -64,7 +64,7 @@ public abstract class PolyAPI implements CallBackListener {
         Callback<PolyResponse> callback = new Callback<PolyResponse>() {
             @Override
             public void onResponse(Call<PolyResponse> call, Response<PolyResponse> response) {
-                if(response.isSuccessful()) {
+                if (response.isSuccessful()) {
                     callBackListener.successfulResponse(response.body());
                 }
             }
