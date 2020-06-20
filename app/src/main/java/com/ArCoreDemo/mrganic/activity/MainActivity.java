@@ -4,13 +4,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,6 +22,7 @@ import com.ArCoreDemo.mrganic.recycler.ItemAdapter;
 import com.ArCoreDemo.mrganic.retrofit.PolyAPI;
 import com.ArCoreDemo.mrganic.retrofit.PolyResponse;
 import com.ArCoreDemo.mrganic.utils.Parser;
+import com.ArCoreDemo.mrganic.utils.SnackBarHelper;
 import com.ArCoreDemo.mrganic.utils.Utility;
 
 import java.util.List;
@@ -42,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     private ItemAdapter adapter;
     private GridLayoutManager layoutManager;
 
+    private SnackBarHelper snackBarHelper;
+
     private String selectedObject;
 
 
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        snackBarHelper = new SnackBarHelper();
         setupAPI();
         setupRecycler();
         setupButtons();
@@ -64,10 +66,9 @@ public class MainActivity extends AppCompatActivity {
             public void successfulResponse(PolyResponse response) {
                 if (response.isEmpty()) {
                     Log.d(TAG, "Nothing on poly for that keyword");
-                    Toast toast = Toast.makeText(MainActivity.this, getString(R.string.nothingForKeyword), Toast.LENGTH_SHORT);
-                    toast.setGravity(Gravity.CENTER, 0, 0);
-                    toast.show();
+                    snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.nothingForKeyword));
                 } else {
+                    snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.loadingModels));
                     List<Item> items = Parser.parseListAssets(response);
                     adapter = new ItemAdapter(items);
                     adapter.setSelected(items.get(0));
@@ -80,9 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "Retrofit failed");
                 if (ex != null) ex.printStackTrace();
 
-                Toast toast = Toast.makeText(MainActivity.this, "Network request failed. Please try again.", Toast.LENGTH_SHORT);
-                toast.setGravity(Gravity.CENTER, 0, 0);
-                toast.show();
+                snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.networkError));
             }
         });
     }
@@ -116,9 +115,7 @@ public class MainActivity extends AppCompatActivity {
                 arIntent.putExtra("fileName", selectedObject);
                 startActivity(arIntent);
             } else {
-                Toast t = Toast.makeText(this, R.string.noModels, Toast.LENGTH_SHORT);
-                t.setGravity(Gravity.CENTER, 0, 0);
-                t.show();
+                snackBarHelper.showTimedMessage(this, getString(R.string.noModels));
             }
         });
     }
@@ -133,10 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 sceneViewerIntent.setPackage("com.google.android.googlequicksearchbox");
                 startActivity(sceneViewerIntent);
             } else {
-                Toast t = Toast.makeText(this, R.string.noModels, Toast.LENGTH_SHORT);
-                t.setGravity(Gravity.CENTER, 0, 0);
-                t.show();
-
+                snackBarHelper.showTimedMessage(this, getString(R.string.noModels));
             }
         });
     }

@@ -19,8 +19,4 @@ public abstract class Utility {
         }
         return availability.isSupported();
     }
-
-    public static boolean isBuildVesionHigherOrEqualTo(int versionNumber) {
-        return Build.VERSION.SDK_INT >= versionNumber;
-    }
 }

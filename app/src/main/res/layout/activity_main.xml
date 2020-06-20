@@ -30,7 +30,7 @@
         android:id="@+id/btnSearchPoly"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="64dp"
         android:background="@drawable/arbutton"
         android:text="@string/search_models"
         app:layout_constraintBottom_toBottomOf="parent"

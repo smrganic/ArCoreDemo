@@ -7,11 +7,14 @@ import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 
 public final class SnackBarHelper {
+
     private Snackbar snackbar;
 
     private String message;
 
     private enum DismissValue {HIDE, SHOW, FINISH}
+
+    private boolean timedMessage;
 
     private static final int COLOR = Color.parseColor("#4aadff");
 
@@ -33,6 +36,13 @@ public final class SnackBarHelper {
         show(activity, message, DismissValue.SHOW);
     }
 
+    public void showTimedMessage(Activity activity, String message) {
+        this.message = message;
+        timedMessage = true;
+        show(activity, message, DismissValue.HIDE);
+        timedMessage = false;
+    }
+
     public void hide(Activity activity) {
         activity.runOnUiThread(() -> {
             if (snackbar != null) {
@@ -46,15 +56,23 @@ public final class SnackBarHelper {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                snackbar =
-                        Snackbar.make(
-                                activity.findViewById(android.R.id.content),
-                                message,
-                                Snackbar.LENGTH_INDEFINITE);
+                if (timedMessage) {
+                    snackbar = Snackbar.make(
+                            activity.findViewById(android.R.id.content),
+                            message,
+                            Snackbar.LENGTH_LONG);
+                } else {
+                    snackbar = Snackbar.make(
+                            activity.findViewById(android.R.id.content),
+                            message,
+                            Snackbar.LENGTH_INDEFINITE);
+                }
+
                 snackbar.getView().setBackgroundColor(COLOR);
 
                 if (behavior != DismissValue.HIDE) {
-                    snackbar.setAction("Dismiss", v -> snackbar.dismiss());
+                    snackbar.setAction("Dismiss", v -> snackbar.dismiss())
+                            .setActionTextColor(Color.WHITE);
                 }
 
                 if (behavior == DismissValue.FINISH) {

@@ -1,5 +1,6 @@
 package com.ArCoreDemo.mrganic.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
@@ -26,7 +27,7 @@ import com.google.ar.sceneform.ux.TransformableNode;
 public class SceneHelper {
 
     private static final String TAG = "SceneHelper";
-    private final SnackBarHelper snackBarHelper;
+    private SnackBarHelper snackBarHelper;
     private CustomArFragment fragment;
     private Scene scene;
     private Camera camera;
@@ -57,28 +58,6 @@ public class SceneHelper {
         showInstructions();
     }
 
-    private void warnIfInsideObject(boolean collision) {
-        if (collision) {
-            Vibrator vibrator = (Vibrator) fragment.getActivity().getSystemService(Context.VIBRATOR_SERVICE);
-            if (Utility.isBuildVesionHigherOrEqualTo(Build.VERSION_CODES.O)) {
-                vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else {
-                vibrator.vibrate(500);
-            }
-        }
-    }
-
-    private void showInstructions() {
-        if (snackBarHelper.isVisible() && snackBarHelper.getMessage().equals(fragment.getString(R.string.searching))) {
-            for (Plane plane : fragment.getArSceneView().getSession().getAllTrackables(Plane.class)) {
-                if (plane.getTrackingState() == TrackingState.TRACKING && plane.getType().equals(Plane.Type.HORIZONTAL_UPWARD_FACING)) {
-                    snackBarHelper.showDismissableMessage(fragment.getActivity(), fragment.getString(R.string.tapInstruction));
-                    break;
-                }
-            }
-        }
-    }
-
     private boolean checkForCollision() {
         //Checks if phone is closer than 1 millimeter to any node
         Ray ray = new Ray(camera.getWorldPosition(), camera.getForward());
@@ -86,9 +65,36 @@ public class SceneHelper {
         return hitTestResult.getNode() != null && hitTestResult.getDistance() < 0.001;
     }
 
+    //Is there a better way to do this?
+    //Explore adding blur
+    private void warnIfInsideObject(boolean collision) {
+        if (collision) {
+            Vibrator vibrator = (Vibrator) fragment.getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+            //Check the installed android version
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                vibrator.vibrate(100);
+            }
+        }
+    }
+
+    private void showInstructions() {
+        if (snackBarHelper.getMessage().equals(fragment.getString(R.string.searching))) {
+            for (Plane plane : fragment.getArSceneView().getSession().getAllTrackables(Plane.class)) {
+                if (plane.getTrackingState() == TrackingState.TRACKING && plane.getType().equals(Plane.Type.HORIZONTAL_UPWARD_FACING)) {
+                    snackBarHelper.showTimedMessage(fragment.getActivity(), fragment.getString(R.string.tapInstruction));
+                    break;
+                }
+            }
+        }
+    }
+
     private void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
 
-        snackBarHelper.hide(fragment.getActivity());
+        if(numberOfAnchorNodes == 0) {
+            snackBarHelper.showTimedMessage(fragment.getActivity(), fragment.getString(R.string.nodeInstruction));
+        }
 
         //Creating anchor and a node for the anchor
         Anchor anchor = hitResult.createAnchor();
