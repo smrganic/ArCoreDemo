@@ -31,7 +31,7 @@ public final class SnackBarHelper {
         show(activity, message, DismissValue.HIDE);
     }
 
-    public void showDismissableMessage(Activity activity, String message) {
+    public void showDismissibleMessage(Activity activity, String message) {
         this.message = message;
         show(activity, message, DismissValue.SHOW);
     }

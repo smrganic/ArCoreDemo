@@ -1,6 +1,5 @@
 package com.ArCoreDemo.mrganic.utils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
@@ -83,7 +82,7 @@ public class SceneHelper {
         if (snackBarHelper.getMessage().equals(fragment.getString(R.string.searching))) {
             for (Plane plane : fragment.getArSceneView().getSession().getAllTrackables(Plane.class)) {
                 if (plane.getTrackingState() == TrackingState.TRACKING && plane.getType().equals(Plane.Type.HORIZONTAL_UPWARD_FACING)) {
-                    snackBarHelper.showTimedMessage(fragment.getActivity(), fragment.getString(R.string.tapInstruction));
+                    snackBarHelper.showDismissibleMessage(fragment.getActivity(), fragment.getString(R.string.tapInstruction));
                     break;
                 }
             }
@@ -92,7 +91,7 @@ public class SceneHelper {
 
     private void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
 
-        if(numberOfAnchorNodes == 0) {
+        if (numberOfAnchorNodes == 1) {
             snackBarHelper.showTimedMessage(fragment.getActivity(), fragment.getString(R.string.nodeInstruction));
         }
 
