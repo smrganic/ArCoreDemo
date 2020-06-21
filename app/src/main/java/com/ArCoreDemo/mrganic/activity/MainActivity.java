@@ -157,20 +157,25 @@ public class MainActivity extends AppCompatActivity {
                 .setCancelable(true)
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .create();
+        //This shows the keyboard on dialog popup
+        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 
-        //Spent way too much time on this
-        //This auto selects the edit text
-        //and shows keyboard
+
+        /*
+        Spent way too much time on this but it auto selects the edit text
+        Then notifies the user and runs a search when enter is pressed
+        on the keyboard
+        */
         editText.requestFocus();
         editText.setOnKeyListener((v, keyCode, event) -> {
             if(event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER){
+                snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.searchingModels));
                 PolyAPI.callAPIWithKeyword(editText.getText().toString());
                 alertDialog.dismiss();
                 return true;
             }
             return false;
         });
-        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         alertDialog.show();
     }
 }

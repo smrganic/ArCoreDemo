@@ -21,7 +21,6 @@ import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.collision.Ray;
 import com.google.ar.sceneform.math.Vector3;
-import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.PlaneRenderer;
 import com.google.ar.sceneform.ux.TransformableNode;
@@ -42,7 +41,7 @@ public class SceneHelper {
         this.scene = fragment.getArSceneView().getScene();
         this.camera = scene.getCamera();
         snackBarHelper = new SnackBarHelper();
-        snackBarHelper.showMessage(fragment.getActivity(), fragment.getString(R.string.searching));
+        snackBarHelper.showMessage(fragment.getActivity(), fragment.getString(R.string.searchForSurface));
         setupFragment();
     }
 
@@ -91,7 +90,7 @@ public class SceneHelper {
     }
 
     private void showInstructions() {
-        if (snackBarHelper.getMessage().equals(fragment.getString(R.string.searching))) {
+        if (snackBarHelper.getMessage().equals(fragment.getString(R.string.searchForSurface))) {
             for (Plane plane : fragment.getArSceneView().getSession().getAllTrackables(Plane.class)) {
                 if (plane.getTrackingState() == TrackingState.TRACKING && plane.getType().equals(Plane.Type.HORIZONTAL_UPWARD_FACING)) {
                     snackBarHelper.showDismissibleMessage(fragment.getActivity(), fragment.getString(R.string.tapInstruction));

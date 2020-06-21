@@ -6,7 +6,7 @@
     <string name="back">Back</string>
     <string name="search_models">Search Models</string>
     <string name="view_in_3d">View in 3D</string>
-    <string name="searching">Point camera at the floor.</string>
+    <string name="searchForSurface">Point camera at the floor.</string>
     <string name="tapInstruction">Tap on a plane to render model.</string>
     <string name="nodeInstruction">Pinch the model to resize. Drag to reposition.</string>
     <string name="networkError">Network request failed. Please try again.</string>
