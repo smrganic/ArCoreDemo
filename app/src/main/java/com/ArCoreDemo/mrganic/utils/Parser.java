@@ -8,7 +8,9 @@ import com.ArCoreDemo.mrganic.retrofit.PolyResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Parser {
+public final class Parser {
+
+    private Parser() {}
 
     public static List<Item> parseListAssets(PolyResponse responseBody) {
 

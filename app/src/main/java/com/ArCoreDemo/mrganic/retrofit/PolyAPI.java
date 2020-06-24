@@ -11,13 +11,18 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public abstract class PolyAPI implements CallBackListener {
-
-    private static CallBackListener callBackListener;
-    private static String APIKey;
+//Final to disable extension
+public final class PolyAPI {
 
     private static final String BASE_API = "https://poly.googleapis.com/";
+    private static String APIKey;
+
+    private static CallBackListener callBackListener;
+
     private static IAPICallPoly apiInterface;
+
+    //To disable instantiation
+    private PolyAPI() {}
 
     private static IAPICallPoly getApiInterface() {
         if (apiInterface == null) {
