@@ -159,6 +159,7 @@ public class SceneHelper {
                 .exceptionally(
                         throwable -> {
                             Log.d(TAG, "Failed to load ModelRenderable");
+                            snackBarHelper.showErrorMessage(fragment.getActivity(), "Model not compatible. Try another.");
                             return null;
                         });
     }

@@ -22,10 +22,6 @@ public final class SnackBarHelper {
         return message;
     }
 
-    public boolean isVisible() {
-        return snackbar != null;
-    }
-
     public void showMessage(Activity activity, String message) {
         this.message = message;
         show(activity, message, DismissValue.HIDE);
@@ -36,20 +32,16 @@ public final class SnackBarHelper {
         show(activity, message, DismissValue.SHOW);
     }
 
+    public void showErrorMessage(Activity activity, String message) {
+        this.message = message;
+        show(activity, message, DismissValue.FINISH);
+    }
+
     public void showTimedMessage(Activity activity, String message) {
         this.message = message;
         timedMessage = true;
         show(activity, message, DismissValue.HIDE);
         timedMessage = false;
-    }
-
-    public void hide(Activity activity) {
-        activity.runOnUiThread(() -> {
-            if (snackbar != null) {
-                snackbar.dismiss();
-            }
-            snackbar = null;
-        });
     }
 
     private void show(Activity activity, String message, DismissValue behavior) {

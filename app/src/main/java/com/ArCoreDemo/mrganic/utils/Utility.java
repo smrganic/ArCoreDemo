@@ -9,12 +9,7 @@ public abstract class Utility {
     public static boolean ArCompatible(Context context) {
         ArCoreApk.Availability availability = ArCoreApk.getInstance().checkAvailability(context);
         if (availability.isTransient()) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ArCompatible(context);
-                }
-            }, 200);
+            new Handler().postDelayed(() -> ArCompatible(context), 200);
         }
         return availability.isSupported();
     }
