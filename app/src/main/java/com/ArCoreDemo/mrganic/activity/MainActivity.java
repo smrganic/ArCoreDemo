@@ -40,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private ItemAdapter adapter;
-    private GridLayoutManager layoutManager;
 
     private SnackBarHelper snackBarHelper;
 
@@ -58,13 +57,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupAPI() {
-        PolyAPI.setAPIKey(getString(R.string.apiKey));
 
         snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.searchingModels));
 
-        PolyAPI.callAPIWithKeyword("");
-
-        PolyAPI.setCallBackListener(new CallBackListener() {
+        CallBackListener callBackListener = new CallBackListener() {
             @Override
             public void successfulResponse(PolyResponse response) {
                 if (response.isEmpty()) {
@@ -77,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
                     recyclerView.setAdapter(adapter);
                 }
             }
-
             @Override
             public void failedResponse(Exception ex) {
                 Log.d(TAG, "Retrofit failed");
@@ -85,12 +80,14 @@ public class MainActivity extends AppCompatActivity {
 
                 snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.networkError));
             }
-        });
+        };
+        PolyAPI.setCallBackListener(callBackListener);
+        PolyAPI.callAPIWithKeyword("");
     }
 
 
     private void setupRecycler() {
-        layoutManager = new GridLayoutManager(this, 2);
+        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         recyclerView = findViewById(R.id.recycleView);
         recyclerView.setLayoutManager(layoutManager);
     }
@@ -152,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("Search", (dialog, which) -> {
                     String keyword = editText.getText().toString();
                     snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.searchingModels));
-                    PolyAPI.callAPIWithKeyword(keyword);
+                    PolyAPI.callAPIWithKeyword(keyword, 40);
                 })
                 .setCancelable(true)
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
