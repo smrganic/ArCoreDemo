@@ -17,12 +17,12 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ArCoreDemo.mrganic.R;
-import com.ArCoreDemo.mrganic.interfaces.CallBackListener;
+import com.ArCoreDemo.mrganic.retrofit.interfaces.CallBackListener;
 import com.ArCoreDemo.mrganic.recycler.Item;
 import com.ArCoreDemo.mrganic.recycler.ItemAdapter;
 import com.ArCoreDemo.mrganic.retrofit.PolyAPI;
-import com.ArCoreDemo.mrganic.retrofit.PolyResponse;
-import com.ArCoreDemo.mrganic.utils.Parser;
+import com.ArCoreDemo.mrganic.retrofit.POJO.PolyResponse;
+import com.ArCoreDemo.mrganic.retrofit.PolyParser;
 import com.ArCoreDemo.mrganic.utils.SnackBarHelper;
 import com.ArCoreDemo.mrganic.utils.Utility;
 
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Nothing on poly for that keyword");
                     snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.nothingForKeyword));
                 } else {
-                    List<Item> items = Parser.parseListAssets(response);
+                    List<Item> items = PolyParser.parseListAssets(response);
                     adapter = new ItemAdapter(items);
                     adapter.setSelected(items.get(0));
                     recyclerView.setAdapter(adapter);

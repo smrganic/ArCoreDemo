@@ -7,8 +7,8 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.ArCoreDemo.mrganic.R;
-import com.ArCoreDemo.mrganic.utils.CustomArFragment;
-import com.ArCoreDemo.mrganic.utils.SceneHelper;
+import com.ArCoreDemo.mrganic.AR.CustomArFragment;
+import com.ArCoreDemo.mrganic.AR.SceneHelper;
 
 public class ArActivity extends AppCompatActivity {
 

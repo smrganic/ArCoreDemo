@@ -1,4 +1,4 @@
-package com.ArCoreDemo.mrganic.utils;
+package com.ArCoreDemo.mrganic.AR;
 
 import android.content.Context;
 import android.net.Uri;
@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import com.ArCoreDemo.mrganic.R;
+import com.ArCoreDemo.mrganic.utils.SnackBarHelper;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;

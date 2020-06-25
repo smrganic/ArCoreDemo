@@ -1,9 +1,10 @@
 
-package com.ArCoreDemo.mrganic.retrofit;
+package com.ArCoreDemo.mrganic.retrofit.POJO;
+
 
 import com.google.gson.annotations.SerializedName;
 
-public class Resource {
+public class Thumbnail {
 
     @SerializedName("contentType")
     private String mContentType;

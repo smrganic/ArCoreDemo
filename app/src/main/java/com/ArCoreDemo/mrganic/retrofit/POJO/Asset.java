@@ -1,5 +1,5 @@
 
-package com.ArCoreDemo.mrganic.retrofit;
+package com.ArCoreDemo.mrganic.retrofit.POJO;
 
 import java.util.List;
 import com.google.gson.annotations.SerializedName;

@@ -2,9 +2,9 @@ package com.ArCoreDemo.mrganic.retrofit;
 
 import android.net.Uri;
 
-import com.ArCoreDemo.mrganic.interfaces.CallBackListener;
-import com.ArCoreDemo.mrganic.interfaces.IAPICallPoly;
-import com.ArCoreDemo.mrganic.utils.PolyUriBuilder;
+import com.ArCoreDemo.mrganic.retrofit.POJO.PolyResponse;
+import com.ArCoreDemo.mrganic.retrofit.interfaces.CallBackListener;
+import com.ArCoreDemo.mrganic.retrofit.interfaces.IAPICallPoly;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -23,8 +23,7 @@ public final class PolyAPI {
     private static IAPICallPoly apiInterface;
 
     //To disable instantiation
-    private PolyAPI() {
-    }
+    private PolyAPI() { }
 
     private static IAPICallPoly getApiInterface() {
         if (apiInterface == null) {
@@ -56,7 +55,7 @@ public final class PolyAPI {
         getPolyAPIResponse(
                 new PolyUriBuilder()
                         .appendKeyword(keyword)
-                        .appendpageSize(pageSize)
+                        .appendPageSize(pageSize)
                         .build());
     }
 

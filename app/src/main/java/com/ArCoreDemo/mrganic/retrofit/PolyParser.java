@@ -1,16 +1,16 @@
-package com.ArCoreDemo.mrganic.utils;
+package com.ArCoreDemo.mrganic.retrofit;
 
 import com.ArCoreDemo.mrganic.recycler.Item;
-import com.ArCoreDemo.mrganic.retrofit.Asset;
-import com.ArCoreDemo.mrganic.retrofit.Format;
-import com.ArCoreDemo.mrganic.retrofit.PolyResponse;
+import com.ArCoreDemo.mrganic.retrofit.POJO.Asset;
+import com.ArCoreDemo.mrganic.retrofit.POJO.Format;
+import com.ArCoreDemo.mrganic.retrofit.POJO.PolyResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class Parser {
+public final class PolyParser {
 
-    private Parser() {}
+    private PolyParser() {}
 
     public static List<Item> parseListAssets(PolyResponse responseBody) {
 

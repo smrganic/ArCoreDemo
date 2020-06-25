@@ -1,8 +1,8 @@
-package com.ArCoreDemo.mrganic.interfaces;
+package com.ArCoreDemo.mrganic.retrofit.interfaces;
 
 import android.net.Uri;
 
-import com.ArCoreDemo.mrganic.retrofit.PolyResponse;
+import com.ArCoreDemo.mrganic.retrofit.POJO.PolyResponse;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

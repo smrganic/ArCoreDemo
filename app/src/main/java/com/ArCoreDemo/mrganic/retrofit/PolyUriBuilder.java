@@ -1,4 +1,4 @@
-package com.ArCoreDemo.mrganic.utils;
+package com.ArCoreDemo.mrganic.retrofit;
 
 import android.net.Uri;
 import android.util.Log;
@@ -25,7 +25,7 @@ public final class PolyUriBuilder {
         }
         return this;
     }
-    public PolyUriBuilder appendpageSize(int pageSize){
+    public PolyUriBuilder appendPageSize(int pageSize){
         uriBuilder.appendQueryParameter("pageSize", String.valueOf(pageSize));
         return this;
     }
