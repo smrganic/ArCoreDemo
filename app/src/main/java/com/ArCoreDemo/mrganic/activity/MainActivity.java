@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         PolyAPI.setCallBackListener(callBackListener);
-        PolyAPI.callAPIWithKeyword("");
+        PolyAPI.callAPI();
     }
 
 
@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("Search", (dialog, which) -> {
                     String keyword = editText.getText().toString();
                     snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.searchingModels));
-                    PolyAPI.callAPIWithKeyword(keyword, 40);
+                    PolyAPI.callAPI(keyword, 40);
                 })
                 .setCancelable(true)
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         editText.setOnKeyListener((v, keyCode, event) -> {
             if(event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER){
                 snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.searchingModels));
-                PolyAPI.callAPIWithKeyword(editText.getText().toString());
+                PolyAPI.callAPI(editText.getText().toString());
                 alertDialog.dismiss();
                 return true;
             }

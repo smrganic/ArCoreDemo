@@ -1,10 +1,10 @@
 package com.ArCoreDemo.mrganic.retrofit;
 
 import android.net.Uri;
-import android.util.Log;
 
 import com.ArCoreDemo.mrganic.interfaces.CallBackListener;
 import com.ArCoreDemo.mrganic.interfaces.IAPICallPoly;
+import com.ArCoreDemo.mrganic.utils.PolyUriBuilder;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -17,15 +17,14 @@ public final class PolyAPI {
 
     private static final String BASE_API = "https://poly.googleapis.com/";
     private static final String TAG = "PolyAPI";
-    private static final String APIKey = "AIzaSyAKyQb2p4l9c4sJU_RahUXSpym2-E3Xjbs";
-    private static final int pageSize = 25;
 
     private static CallBackListener callBackListener;
 
     private static IAPICallPoly apiInterface;
 
     //To disable instantiation
-    private PolyAPI() { }
+    private PolyAPI() {
+    }
 
     private static IAPICallPoly getApiInterface() {
         if (apiInterface == null) {
@@ -42,50 +41,23 @@ public final class PolyAPI {
         PolyAPI.callBackListener = callBackListener;
     }
 
-    public static void callAPIWithKeyword(String keyword) {
-
-        Uri.Builder uriBuilder = new Uri.Builder()
-                .scheme("https")
-                .authority("poly.googleapis.com")
-                .appendPath("v1")
-                .appendPath("assets")
-                .appendQueryParameter("key", APIKey)
-                .appendQueryParameter("curated", Boolean.toString(true))
-                .appendQueryParameter("format", "GLTF2")
-                .appendQueryParameter("pageSize", String.valueOf(pageSize));
-
-        if (keyword != null && !keyword.isEmpty()) {
-            uriBuilder.appendQueryParameter("keywords", keyword);
-        }
-
-        Uri uri = uriBuilder.build();
-
-        Log.d(TAG, "Url used for api call: " + uri.toString());
-
-        getPolyAPIResponse(uri);
+    public static void callAPI() {
+        getPolyAPIResponse(new PolyUriBuilder().build());
     }
 
-    public static void callAPIWithKeyword(String keyword, int pageSize) {
+    public static void callAPI(String keyword) {
+        getPolyAPIResponse(
+                new PolyUriBuilder()
+                        .appendKeyword(keyword)
+                        .build());
+    }
 
-        Uri.Builder uriBuilder = new Uri.Builder()
-                .scheme("https")
-                .authority("poly.googleapis.com")
-                .appendPath("v1")
-                .appendPath("assets")
-                .appendQueryParameter("key", APIKey)
-                .appendQueryParameter("curated", Boolean.toString(true))
-                .appendQueryParameter("format", "GLTF2")
-                .appendQueryParameter("pageSize", String.valueOf(pageSize));
-
-        if (keyword != null && !keyword.isEmpty()) {
-            uriBuilder.appendQueryParameter("keywords", keyword);
-        }
-
-        Uri uri = uriBuilder.build();
-
-        Log.d(TAG, "Url used for api call: " + uri.toString());
-
-        getPolyAPIResponse(uri);
+    public static void callAPI(String keyword, int pageSize) {
+        getPolyAPIResponse(
+                new PolyUriBuilder()
+                        .appendKeyword(keyword)
+                        .appendpageSize(pageSize)
+                        .build());
     }
 
     private static void getPolyAPIResponse(Uri url) {
@@ -93,7 +65,10 @@ public final class PolyAPI {
         Callback<PolyResponse> callback = new Callback<PolyResponse>() {
             @Override
             public void onResponse(Call<PolyResponse> call, Response<PolyResponse> response) {
-                if (response.isSuccessful()) { callBackListener.successfulResponse(response.body()); } }
+                if (response.isSuccessful()) {
+                    callBackListener.successfulResponse(response.body());
+                }
+            }
 
             @Override
             public void onFailure(Call<PolyResponse> call, Throwable t) {
