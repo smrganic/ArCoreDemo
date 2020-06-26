@@ -60,14 +60,16 @@ public class MainActivity extends AppCompatActivity {
 
         snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.searchingModels));
 
-        CallBackListener callBackListener = new CallBackListener() {
+        CallBackListener onCallBack = new CallBackListener() {
             @Override
-            public void successfulResponse(PolyResponse response) {
-                if (response.isEmpty()) {
+            public void successfulResponse(PolyResponse polyResponse) {
+                if (polyResponse.isEmpty()) {
                     Log.d(TAG, "Nothing on poly for that keyword");
-                    snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.nothingForKeyword));
+                    snackBarHelper.showTimedMessage(
+                            MainActivity.this,
+                            getString(R.string.nothingForKeyword));
                 } else {
-                    List<Item> items = PolyParser.parseListAssets(response);
+                    List<Item> items = PolyParser.parseListAssets(polyResponse);
                     adapter = new ItemAdapter(items);
                     adapter.setSelected(items.get(0));
                     recyclerView.setAdapter(adapter);
@@ -78,10 +80,12 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "Retrofit failed");
                 if (ex != null) ex.printStackTrace();
 
-                snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.networkError));
+                snackBarHelper.showTimedMessage(
+                                MainActivity.this,
+                                getString(R.string.networkError));
             }
         };
-        PolyAPI.setCallBackListener(callBackListener);
+        PolyAPI.setCallBackListener(onCallBack);
         PolyAPI.callAPI();
     }
 

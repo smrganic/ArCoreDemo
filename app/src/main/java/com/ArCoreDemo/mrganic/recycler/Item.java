@@ -34,9 +34,7 @@ public class Item {
         this.thumbnail = thumbnail;
     }
 
-    public RecyclerView.ViewHolder getHolder() {
-        return holder;
-    }
+    public ItemHolder getHolder() { return holder; }
 
     public void setHolder(ItemHolder holder) {
         this.holder = holder;

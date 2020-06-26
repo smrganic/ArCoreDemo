@@ -23,7 +23,7 @@ public class ItemHolder extends RecyclerView.ViewHolder {
     public ItemHolder(@NonNull View itemView, ItemAdapter adapter) {
         super(itemView);
         this.adapter = adapter;
-        ivThumbnail = itemView.findViewById(R.id.iv);
+        ivThumbnail = itemView.findViewById(R.id.ivThumbnail);
     }
 
     public void setItem(Item item) {
@@ -42,7 +42,7 @@ public class ItemHolder extends RecyclerView.ViewHolder {
         Item selected = adapter.getSelected();
         if (!item.equals(selected)) {
             if (selected != null) {
-                selected.getHolder().itemView.findViewById(R.id.iv).setBackgroundColor(DESELECTED_VALUE);
+                selected.getHolder().ivThumbnail.setBackgroundColor(DESELECTED_VALUE);
             }
             adapter.setSelected(item);
             ivThumbnail.setSelected(true);

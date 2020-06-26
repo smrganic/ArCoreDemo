@@ -28,8 +28,10 @@ public class ItemAdapter extends RecyclerView.Adapter {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View imageView = LayoutInflater.from(parent.getContext()).inflate(R.layout.thumbnail, parent, false);
-        return new ItemHolder(imageView, this);
+        View layout = LayoutInflater
+                        .from(parent.getContext())
+                        .inflate(R.layout.thumbnail, parent, false);
+        return new ItemHolder(layout, this);
     }
 
     @Override
@@ -37,11 +39,8 @@ public class ItemAdapter extends RecyclerView.Adapter {
         if (holder.getItemId() != position) {
             ((ItemHolder) holder).setItem(items.get(position));
             items.get(position).setHolder((ItemHolder) holder);
-            ImageView iv = (ImageView) holder.itemView.findViewById(R.id.iv);
+            ImageView iv = (ImageView) holder.itemView.findViewById(R.id.ivThumbnail);
             Picasso.get().load(items.get(position).getThumbnail()).into(iv);
-            //Tells Android the state of view may have changed
-            //& need to be re-drawn.
-            iv.requestLayout();
         }
     }
 
