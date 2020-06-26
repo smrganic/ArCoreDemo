@@ -4,13 +4,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 
 public class Item {
-    private static final String TAG = "RecyclerItem";
+    private static final String TAG = "Item";
 
     private String id;
     private String modelUrl;
     private String thumbnail;
 
-    private RecyclerView.ViewHolder viewHolder;
+    private ItemHolder holder;
 
     //Constructor for Item
     public Item(String id) {
@@ -34,11 +34,11 @@ public class Item {
         this.thumbnail = thumbnail;
     }
 
-    public RecyclerView.ViewHolder getViewHolder() {
-        return viewHolder;
+    public RecyclerView.ViewHolder getHolder() {
+        return holder;
     }
 
-    public void setViewHolder(RecyclerView.ViewHolder viewHolder) {
-        this.viewHolder = viewHolder;
+    public void setHolder(ItemHolder holder) {
+        this.holder = holder;
     }
 }

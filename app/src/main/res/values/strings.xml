@@ -11,4 +11,5 @@
     <string name="nodeInstruction">Pinch the model to resize. Drag to reposition.</string>
     <string name="networkError">Network request failed. Please try again.</string>
     <string name="searchingModels">Searching models…</string>
+    <string name="modelimage">ModelImage</string>
 </resources>

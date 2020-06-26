@@ -1,7 +1,8 @@
 package com.ArCoreDemo.mrganic.recycler;
 
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -27,35 +28,19 @@ public class ItemAdapter extends RecyclerView.Adapter {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-        //Programmatically create new image view
-        ImageView iv = new ImageView(parent.getContext());
-
-        //Sets the parameters of the image view
-        FrameLayout.LayoutParams
-                layoutParams = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(4, 4, 4, 4);
-
-        iv.setPadding(8, 8, 8, 8);
-        iv.setImageResource(R.drawable.ivplaceholder);
-        iv.setCropToPadding(true);
-        iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
-
-        iv.setLayoutParams(layoutParams);
-
-        return new ItemHolder(iv, this);
+        View imageView = LayoutInflater.from(parent.getContext()).inflate(R.layout.thumbnail, parent, false);
+        return new ItemHolder(imageView, this);
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder.getItemId() != position) {
             ((ItemHolder) holder).setItem(items.get(position));
-            items.get(position).setViewHolder(holder);
-            ImageView iv = (ImageView) holder.itemView;
+            items.get(position).setHolder((ItemHolder) holder);
+            ImageView iv = (ImageView) holder.itemView.findViewById(R.id.iv);
             Picasso.get().load(items.get(position).getThumbnail()).into(iv);
-            //Todo check what this does
+            //Tells Android the state of view may have changed
+            //& need to be re-drawn.
             iv.requestLayout();
         }
     }

@@ -6,29 +6,35 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.ArCoreDemo.mrganic.R;
+
 
 public class ItemHolder extends RecyclerView.ViewHolder {
+
+    private static final String TAG = "ItemHolder";
 
     private static final int SELECTED_VALUE = Color.parseColor("#ffb26c");
     private static final int DESELECTED_VALUE = Color.WHITE;
 
     private ItemAdapter adapter;
     private Item item;
+    private View ivThumbnail;
 
     public ItemHolder(@NonNull View itemView, ItemAdapter adapter) {
         super(itemView);
         this.adapter = adapter;
+        ivThumbnail = itemView.findViewById(R.id.iv);
     }
 
     public void setItem(Item item) {
         this.item = item;
-        itemView.setOnClickListener(this::onClick);
+        ivThumbnail.setOnClickListener(this::onClick);
         if (item.equals(adapter.getSelected())) {
-            itemView.setSelected(true);
-            itemView.setBackgroundColor(SELECTED_VALUE);
+            ivThumbnail.setSelected(true);
+            ivThumbnail.setBackgroundColor(SELECTED_VALUE);
         } else {
-            itemView.setSelected(false);
-            itemView.setBackgroundColor(DESELECTED_VALUE);
+            ivThumbnail.setSelected(false);
+            ivThumbnail.setBackgroundColor(DESELECTED_VALUE);
         }
     }
 
@@ -36,11 +42,11 @@ public class ItemHolder extends RecyclerView.ViewHolder {
         Item selected = adapter.getSelected();
         if (!item.equals(selected)) {
             if (selected != null) {
-                selected.getViewHolder().itemView.setBackgroundColor(DESELECTED_VALUE);
+                selected.getHolder().itemView.findViewById(R.id.iv).setBackgroundColor(DESELECTED_VALUE);
             }
             adapter.setSelected(item);
-            itemView.setSelected(true);
-            itemView.setBackgroundColor(SELECTED_VALUE);
+            ivThumbnail.setSelected(true);
+            ivThumbnail.setBackgroundColor(SELECTED_VALUE);
         }
     }
 }
