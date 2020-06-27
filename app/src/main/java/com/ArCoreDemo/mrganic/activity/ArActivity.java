@@ -24,7 +24,7 @@ public class ArActivity extends AppCompatActivity {
     private void init() {
 
         //Initialising back button
-        Button button = findViewById(R.id.btnSearchPoly);
+        Button button = findViewById(R.id.btnBack);
         button.setOnClickListener(v -> finish());
 
         //Get selected object from intent

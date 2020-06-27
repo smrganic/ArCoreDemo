@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LAYOUT_MANAGER_STATE = "LAYOUT_MANAGER_STATE";
 
-    private Button button3D;
+    private Button buttonAR;
     private Button buttonSearch;
 
     private RecyclerView recyclerView;
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "Retrofit failed");
                 if (ex != null) ex.printStackTrace();
 
-                snackBarHelper.showTimedMessage(
+                snackBarHelper.showMessage(
                                 MainActivity.this,
                                 getString(R.string.networkError));
             }
@@ -98,19 +98,19 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setupButtons() {
-        button3D = findViewById(R.id.btnEnter3D);
-        buttonSearch = findViewById(R.id.btnSearchPoly);
-        if (Utility.ArCompatible(this)) {
+        buttonAR = findViewById(R.id.btnEnterAR);
+        buttonSearch = findViewById(R.id.btnBack);
+        if (Utility.ArCompatible(MainActivity.this)) {
             setARListeners();
         } else {
-            setNonArListeners();
+            setNonARListeners();
         }
         buttonSearch.setOnClickListener(this::onSearch);
     }
 
 
     private void setARListeners() {
-        button3D.setOnClickListener(v -> {
+        buttonAR.setOnClickListener(v -> {
             //Creates new intent with source -> destination and starts new activity
             if (adapter != null) {
                 selectedObject = adapter.getSelected().getModelUrl();
@@ -124,8 +124,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void setNonArListeners() {
-        button3D.setOnClickListener(v -> {
+    private void setNonARListeners() {
+        buttonAR.setOnClickListener(v -> {
             if (adapter != null) {
                 selectedObject = adapter.getSelected().getModelUrl();
                 Intent sceneViewerIntent = new Intent(Intent.ACTION_VIEW);
@@ -152,14 +152,18 @@ public class MainActivity extends AppCompatActivity {
                 .setView(search)
                 .setPositiveButton("Search", (dialog, which) -> {
                     String keyword = editText.getText().toString();
-                    snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.searchingModels));
+                    snackBarHelper.showTimedMessage(
+                            MainActivity.this,
+                            getString(R.string.searchingModels));
                     PolyAPI.callAPI(keyword, 40);
                 })
                 .setCancelable(true)
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .create();
         //This shows the keyboard on dialog popup
-        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+        alertDialog.getWindow()
+                .setSoftInputMode(
+                        WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
 
         /*
@@ -170,7 +174,9 @@ public class MainActivity extends AppCompatActivity {
         editText.requestFocus();
         editText.setOnKeyListener((v, keyCode, event) -> {
             if(event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER){
-                snackBarHelper.showTimedMessage(MainActivity.this, getString(R.string.searchingModels));
+                snackBarHelper.showTimedMessage(
+                        MainActivity.this,
+                        getString(R.string.searchingModels));
                 PolyAPI.callAPI(editText.getText().toString());
                 alertDialog.dismiss();
                 return true;

@@ -16,18 +16,18 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/btnEnter3D"
+        android:id="@+id/btnEnterAR"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:background="@drawable/arbutton"
         android:text="@string/view_in_3d"
-        app:layout_constraintBottom_toTopOf="@+id/btnSearchPoly"
+        app:layout_constraintBottom_toTopOf="@+id/btnBack"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
     <Button
-        android:id="@+id/btnSearchPoly"
+        android:id="@+id/btnBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="64dp"

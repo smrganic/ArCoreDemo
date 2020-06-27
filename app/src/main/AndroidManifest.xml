@@ -23,6 +23,7 @@
             android:screenOrientation="portrait"
             ></activity>
         <activity
+            android:windowSoftInputMode="adjustPan"
             android:name="com.ArCoreDemo.mrganic.activity.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
