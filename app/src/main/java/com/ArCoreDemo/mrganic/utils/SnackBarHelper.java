@@ -18,6 +18,10 @@ public final class SnackBarHelper {
 
     private static final int COLOR = Color.parseColor("#4aadff");
 
+    public boolean isShown() { return snackbar.isShown(); }
+
+    public void dismiss() { snackbar.dismiss(); }
+
     public String getMessage() {
         return message;
     }

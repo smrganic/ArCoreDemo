@@ -12,4 +12,5 @@
     <string name="networkError">Network request failed. Please try again.</string>
     <string name="searchingModels">Searching models…</string>
     <string name="modelimage">ModelImage</string>
+    <string name="insideModel">Please move outside of the model.</string>
 </resources>

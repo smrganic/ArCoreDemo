@@ -1,6 +1,8 @@
 package com.ArCoreDemo.mrganic.AR;
 
 import android.content.Context;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.net.Uri;
 import android.os.Build;
 import android.os.VibrationEffect;
@@ -13,8 +15,10 @@ import com.ArCoreDemo.mrganic.utils.SnackBarHelper;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
+import com.google.ar.core.Session;
 import com.google.ar.core.TrackingState;
 import com.google.ar.sceneform.AnchorNode;
+import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.Camera;
 import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.HitTestResult;
@@ -31,6 +35,8 @@ public class SceneHelper {
     private static final String TAG = "SceneHelper";
     private SnackBarHelper snackBarHelper;
     private CustomArFragment fragment;
+    private ArSceneView sceneView;
+    private PlaneRenderer planeRenderer;
     private Scene scene;
     private Camera camera;
     private ModelRenderable modelRenderable;
@@ -39,10 +45,18 @@ public class SceneHelper {
 
     public SceneHelper(CustomArFragment fragment) {
         this.fragment = fragment;
-        this.scene = fragment.getArSceneView().getScene();
+
+        this.sceneView = fragment.getArSceneView();
+        planeRenderer = sceneView.getPlaneRenderer();
+
+        this.scene = sceneView.getScene();
         this.camera = scene.getCamera();
+
         snackBarHelper = new SnackBarHelper();
-        snackBarHelper.showMessage(fragment.getActivity(), fragment.getString(R.string.searchForSurface));
+        snackBarHelper
+                .showMessage(
+                        fragment.getActivity(),
+                        fragment.getString(R.string.searchForSurface));
         setupFragment();
     }
 
@@ -62,8 +76,17 @@ public class SceneHelper {
     }
 
     private void renderDetectedPlane() {
-        PlaneRenderer planeRenderer = fragment.getArSceneView().getPlaneRenderer();
-        planeRenderer.getMaterial().thenAccept(material -> {material.setFloat(PlaneRenderer.MATERIAL_SPOTLIGHT_RADIUS, 100f);});
+        if(!planeRenderer.isVisible()) return;
+        else if(numberOfAnchorNodes == 0)
+            planeRenderer
+                    .getMaterial()
+                    .thenAccept(
+                            material -> {
+                                material
+                                    .setFloat(
+                                            PlaneRenderer.MATERIAL_SPOTLIGHT_RADIUS, 100f);
+                            });
+        else planeRenderer.setVisible(false);
 
         //Used for changing render matrix matrix color
         //planeRenderer.getMaterial().thenAccept(material -> {material.setFloat3(PlaneRenderer.MATERIAL_COLOR, new Color(1f,0f,0f));});
@@ -80,19 +103,17 @@ public class SceneHelper {
     //Explore adding blur
     private void warnIfInsideObject(boolean collision) {
         if (collision) {
-            Vibrator vibrator = (Vibrator) fragment.getActivity().getSystemService(Context.VIBRATOR_SERVICE);
-            //Check the installed android version
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else {
-                vibrator.vibrate(100);
+            if(!snackBarHelper.isShown()) {
+                snackBarHelper.showTimedMessage(fragment.getActivity(), fragment.getActivity().getString(R.string.insideModel));
+                ToneGenerator toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP);
             }
         }
     }
 
     private void showInstructions() {
         if (snackBarHelper.getMessage().equals(fragment.getString(R.string.searchForSurface))) {
-            for (Plane plane : fragment.getArSceneView().getSession().getAllTrackables(Plane.class)) {
+            for (Plane plane : sceneView.getSession().getAllTrackables(Plane.class)) {
                 if (plane.getTrackingState() == TrackingState.TRACKING && plane.getType().equals(Plane.Type.HORIZONTAL_UPWARD_FACING)) {
                     snackBarHelper.showDismissibleMessage(fragment.getActivity(), fragment.getString(R.string.tapInstruction));
                     break;
@@ -112,7 +133,7 @@ public class SceneHelper {
             //Creating anchor and a node for the anchor
             Anchor anchor = hitResult.createAnchor();
             AnchorNode anchorNode = new AnchorNode(anchor);
-            anchorNode.setParent(fragment.getArSceneView().getScene());
+            anchorNode.setParent(scene);
 
             //Create transformable object and add it to anchor from above
             TransformableNode object = new TransformableNode(fragment.getTransformationSystem());
@@ -139,7 +160,7 @@ public class SceneHelper {
     }
 
     //Getting GLTF2 object from the internet using URI and constructing modelRenderable
-    public void renderObject(String selectedObject) {
+    public void setObject(String selectedObject) {
 
         Log.d(TAG, "URL for object render: " + selectedObject);
 
@@ -147,7 +168,7 @@ public class SceneHelper {
 
         RenderableSource source = RenderableSource.builder()
                 .setSource(
-                        fragment.getArSceneView().getContext(),
+                        sceneView.getContext(),
                         modelURI,
                         RenderableSource.SourceType.GLTF2)
                 .setRecenterMode(RenderableSource.RecenterMode.ROOT)
