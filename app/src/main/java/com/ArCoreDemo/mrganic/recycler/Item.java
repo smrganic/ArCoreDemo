@@ -1,8 +1,5 @@
 package com.ArCoreDemo.mrganic.recycler;
 
-import androidx.recyclerview.widget.RecyclerView;
-
-
 public class Item {
     private static final String TAG = "Item";
 
@@ -34,7 +31,9 @@ public class Item {
         this.thumbnail = thumbnail;
     }
 
-    public ItemHolder getHolder() { return holder; }
+    public ItemHolder getHolder() {
+        return holder;
+    }
 
     public void setHolder(ItemHolder holder) {
         this.holder = holder;

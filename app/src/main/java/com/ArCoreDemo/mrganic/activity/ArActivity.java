@@ -2,14 +2,13 @@ package com.ArCoreDemo.mrganic.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.UserManager;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.ArCoreDemo.mrganic.R;
 import com.ArCoreDemo.mrganic.AR.CustomArFragment;
 import com.ArCoreDemo.mrganic.AR.SceneHelper;
+import com.ArCoreDemo.mrganic.R;
 
 public class ArActivity extends AppCompatActivity {
 
@@ -36,7 +35,7 @@ public class ArActivity extends AppCompatActivity {
         CustomArFragment fragment =
                 (CustomArFragment)
                         getSupportFragmentManager()
-                        .findFragmentById(R.id.ux_fragment);
+                                .findFragmentById(R.id.ux_fragment);
 
         //Delegating rendering away from parent activity
         SceneHelper sceneHelper = new SceneHelper(fragment);

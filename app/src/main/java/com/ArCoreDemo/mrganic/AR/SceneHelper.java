@@ -1,12 +1,8 @@
 package com.ArCoreDemo.mrganic.AR;
 
-import android.content.Context;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.net.Uri;
-import android.os.Build;
-import android.os.VibrationEffect;
-import android.os.Vibrator;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -15,7 +11,6 @@ import com.ArCoreDemo.mrganic.utils.SnackBarHelper;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.HitResult;
 import com.google.ar.core.Plane;
-import com.google.ar.core.Session;
 import com.google.ar.core.TrackingState;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.ArSceneView;
@@ -25,7 +20,6 @@ import com.google.ar.sceneform.HitTestResult;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.assets.RenderableSource;
 import com.google.ar.sceneform.collision.Ray;
-import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.PlaneRenderer;
 import com.google.ar.sceneform.ux.TransformableNode;
@@ -76,15 +70,15 @@ public class SceneHelper {
     }
 
     private void renderDetectedPlane() {
-        if(!planeRenderer.isVisible()) return;
-        else if(numberOfAnchorNodes == 0)
+        if (!planeRenderer.isVisible()) return;
+        else if (numberOfAnchorNodes == 0)
             planeRenderer
                     .getMaterial()
                     .thenAccept(
                             material -> {
                                 material
-                                    .setFloat(
-                                            PlaneRenderer.MATERIAL_SPOTLIGHT_RADIUS, 100f);
+                                        .setFloat(
+                                                PlaneRenderer.MATERIAL_SPOTLIGHT_RADIUS, 100f);
                             });
         else planeRenderer.setVisible(false);
 
@@ -103,8 +97,11 @@ public class SceneHelper {
     //Explore adding blur
     private void warnIfInsideObject(boolean collision) {
         if (collision) {
-            if(!snackBarHelper.isShown()) {
-                snackBarHelper.showTimedMessage(fragment.getActivity(), fragment.getActivity().getString(R.string.insideModel));
+            if (!snackBarHelper.isShown()) {
+                snackBarHelper
+                        .showTimedMessage(
+                                fragment.getActivity(),
+                                fragment.getActivity().getString(R.string.insideModel));
                 ToneGenerator toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
                 toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP);
             }
@@ -114,8 +111,13 @@ public class SceneHelper {
     private void showInstructions() {
         if (snackBarHelper.getMessage().equals(fragment.getString(R.string.searchForSurface))) {
             for (Plane plane : sceneView.getSession().getAllTrackables(Plane.class)) {
-                if (plane.getTrackingState() == TrackingState.TRACKING && plane.getType().equals(Plane.Type.HORIZONTAL_UPWARD_FACING)) {
-                    snackBarHelper.showDismissibleMessage(fragment.getActivity(), fragment.getString(R.string.tapInstruction));
+                if (plane.getTrackingState() == TrackingState.TRACKING
+                        &&
+                        plane.getType().equals(Plane.Type.HORIZONTAL_UPWARD_FACING)) {
+                    snackBarHelper
+                            .showDismissibleMessage(
+                                    fragment.getActivity(),
+                                    fragment.getString(R.string.tapInstruction));
                     break;
                 }
             }
@@ -124,12 +126,16 @@ public class SceneHelper {
 
     private void onTapPlane(HitResult hitResult, Plane plane, MotionEvent motionEvent) {
 
-        if (numberOfAnchorNodes == 0) {
-            snackBarHelper.showTimedMessage(fragment.getActivity(), fragment.getString(R.string.nodeInstruction));
-        }
-
         //Limit object placement on horizontal planes
-        if(plane.getTrackingState() == TrackingState.TRACKING && plane.getType() == Plane.Type.HORIZONTAL_UPWARD_FACING) {
+        if (plane.getTrackingState() == TrackingState.TRACKING
+                &&
+                plane.getType() == Plane.Type.HORIZONTAL_UPWARD_FACING) {
+            if (numberOfAnchorNodes == 0) {
+                snackBarHelper
+                        .showTimedMessage(
+                                fragment.getActivity(),
+                                fragment.getString(R.string.nodeInstruction));
+            }
             //Creating anchor and a node for the anchor
             Anchor anchor = hitResult.createAnchor();
             AnchorNode anchorNode = new AnchorNode(anchor);
@@ -138,14 +144,13 @@ public class SceneHelper {
             //Create transformable object and add it to anchor from above
             TransformableNode object = new TransformableNode(fragment.getTransformationSystem());
             object.setRenderable(modelRenderable);
-            object.getScaleController().setMinScale(0.3f);
-            object.getScaleController().setMaxScale(0.65f);
-            object.setLocalScale(new Vector3(0.2f,0.2f,0.2f));
+            //object.getScaleController().setMinScale(0.3f);
+            //object.getScaleController().setMaxScale(0.65f);
+            //object.setLocalScale(new Vector3(0.2f, 0.2f, 0.2f));
             object.setParent(anchorNode);
             object.select();
             numberOfAnchorNodes++;
         }
-
 
         //This releases nodes so that the renderer doesn't get overloaded
         if (numberOfAnchorNodes > 5) {
